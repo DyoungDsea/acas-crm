@@ -1,0 +1,294 @@
+/* ===========================================================
+   ACAS Group — design tokens
+   =========================================================== */
+:root {
+    --brand-green: #1f3a2e;
+    --brand-green-dark: #14251d;
+    --brand-gold: #c99a3f;
+    --paper: #f7f5f0;
+    --ink: #172019;
+    --ink-muted: #5b6660;
+    --line: #e4e0d6;
+    --danger: #b3413b;
+    --success: #2f7d52;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--paper);
+}
+
+/* -----------------------------------------------------------
+   Bootstrap 5.3 CDN theming.
+   The shipped CDN build sets component variables (--bs-btn-bg
+   etc.) to hardcoded defaults at compile time — overriding
+   --bs-primary alone does NOT retint .btn-primary. Each
+   component's own variables have to be set directly.
+   ----------------------------------------------------------- */
+.btn-primary {
+    --bs-btn-bg: var(--brand-green);
+    --bs-btn-border-color: var(--brand-green);
+    --bs-btn-hover-bg: var(--brand-green-dark);
+    --bs-btn-hover-border-color: var(--brand-green-dark);
+    --bs-btn-active-bg: var(--brand-green-dark);
+    --bs-btn-active-border-color: var(--brand-green-dark);
+    --bs-btn-focus-shadow-rgb: 31, 58, 46;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--ink-muted);
+    --bs-btn-border-color: var(--line);
+    --bs-btn-hover-bg: var(--paper);
+    --bs-btn-hover-color: var(--ink);
+    --bs-btn-hover-border-color: var(--line);
+}
+
+.btn-link {
+    color: var(--brand-green);
+}
+
+.text-primary {
+    color: var(--brand-green) !important;
+}
+
+a {
+    color: var(--brand-green);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--brand-green-dark);
+    /* text-decoration: underline; */
+}
+
+.form-control:focus {
+    border-color: var(--brand-green);
+    box-shadow: 0 0 0 .2rem rgba(31, 58, 46, .15);
+}
+
+.form-check-input:checked {
+    background-color: var(--brand-green);
+    border-color: var(--brand-green);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 .2rem rgba(31, 58, 46, .15);
+}
+
+.is-invalid {
+    background-image: none !important;
+}
+
+/* ===========================================================
+   Auth shell — shared by login / forgot-password / reset-password
+   =========================================================== */
+.auth-shell {
+    min-height: 100vh;
+    display: flex;
+}
+
+.auth-panel {
+    position: relative;
+    overflow: hidden;
+    flex: 0 0 42%;
+    max-width: 560px;
+    background: linear-gradient(165deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
+    color: #fff;
+    padding: 3.5rem;
+    display: flex;
+    align-items: flex-end;
+}
+
+/* Signature element: quiet plowed-row / contour-line texture,
+   broken by one gold line. Grounded in the group's roots in
+   rice and crop farming rather than a decorative gradient blob. */
+.auth-panel::before {
+    content: "";
+    position: absolute;
+    inset: -20% -10%;
+    background-image: repeating-linear-gradient(0deg,
+            rgba(255, 255, 255, .06) 0px,
+            rgba(255, 255, 255, .06) 1px,
+            transparent 1px,
+            transparent 28px);
+    animation: acas-drift-rows 70s linear infinite;
+}
+
+.auth-panel::after {
+    content: "";
+    position: absolute;
+    left: 3.5rem;
+    right: 3.5rem;
+    top: 44%;
+    height: 2px;
+    background: var(--brand-gold);
+    opacity: .9;
+}
+
+@keyframes acas-drift-rows {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(28px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-panel::before {
+        animation: none;
+    }
+}
+
+.auth-panel__content {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-mark {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    margin-bottom: 2.25rem;
+}
+
+.auth-mark__logo {
+    width: 100px;
+    height: 100px;
+}
+
+.auth-mark__word {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+}
+
+.auth-panel__tagline {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1.35;
+    max-width: 22ch;
+    color: rgba(255, 255, 255, .92);
+}
+
+/* Mobile: the panel collapses to a compact top band rather than
+   disappearing — the brand identity still shows up first. */
+.auth-panel-mobile {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: var(--brand-green);
+    color: #fff;
+    padding: 1.5rem;
+}
+
+.auth-mark__logo--sm {
+    width: 50px;
+    height: 50px;
+}
+
+.auth-mark__word--sm {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+}
+
+.auth-form-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+}
+
+.auth-form-area__inner {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-eyebrow {
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--brand-gold);
+    margin-bottom: .35rem;
+}
+
+.auth-title {
+    font-family: var(--font-display);
+    font-size: 1.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: .4rem;
+}
+
+.auth-subtitle {
+    color: var(--ink-muted);
+    font-size: .92rem;
+    margin-bottom: 1.75rem;
+}
+
+.auth-link {
+    color: var(--brand-green);
+    font-weight: 500;
+}
+
+.auth-back-link {
+    color: var(--ink-muted);
+    font-size: .88rem;
+}
+
+.auth-back-link:hover {
+    color: var(--brand-green);
+}
+
+.auth-help-trigger {
+    color: var(--ink-muted);
+    font-size: .85rem;
+    padding: 0;
+    text-decoration: none;
+}
+
+.auth-help-trigger:hover {
+    color: var(--brand-green);
+}
+
+.auth-help-list {
+    padding-left: 1.1rem;
+    font-size: .9rem;
+    color: var(--ink);
+    margin-bottom: 0;
+}
+
+.auth-help-list li {
+    margin-bottom: .6rem;
+}
+
+.auth-help-list li:last-child {
+    margin-bottom: 0;
+}
+
+.auth-submit {
+    border-radius: .5rem;
+}
+
+@media (max-width: 991.98px) {
+    .auth-shell {
+        flex-direction: column;
+    }
+
+    .auth-form-area {
+        padding: 2.5rem 1.5rem;
+    }
+}

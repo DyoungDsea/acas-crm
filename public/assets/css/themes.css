@@ -1,0 +1,60 @@
+/* ===========================================================
+   Per-company brand color overrides.
+
+   Super admin has no theme class and uses the :root primary
+   (--brand-green / --brand-green-dark, defined in app.css).
+   Each company overrides those same two variables on <body> —
+   that's enough to retint the sidebar, primary buttons, focus
+   rings, and links everywhere on that company's pages, since
+   every one of those already reads from --brand-green rather
+   than a hardcoded value. One override point, not one per
+   component.
+
+   --brand-gold stays constant across every theme on purpose —
+   it's the one thing that says "same group" no matter which
+   company you're looking at.
+   =========================================================== */
+
+/* ACAS Farms — rice, agro, poultry, fishery, cash crop, advisory.
+   Closest in spirit to the group's root green, shifted olive and
+   a touch lighter so it still reads as distinct from super admin. */
+body.theme-farms {
+  --brand-green: #35502a;
+  --brand-green-dark: #26391e;
+}
+
+/* ACAS Homes & Properties — brick/clay brown, real-estate coded. */
+body.theme-properties {
+  --brand-green: #5c3a2e;
+  --brand-green-dark: #422a21;
+}
+
+/* ACAS Pharmacy — deep teal, clinical and trustworthy. */
+body.theme-pharmacy {
+  --brand-green: #1f4a4a !important;
+  --brand-green-dark: #163636 !important;
+}
+
+/* Kezong Trading — deep navy, commerce and finance coded. */
+body.theme-trading {
+  --brand-green: #22314a;
+  --brand-green-dark: #182335;
+}
+
+/* Helion Dynamics — bronze/amber, sun and solar without going neon. */
+body.theme-energy {
+  --brand-green: #5a3a14;
+  --brand-green-dark: #42290e;
+}
+
+/* T & T Prime Venture — deep wine/maroon, automotive energy. */
+body.theme-automotive {
+  --brand-green: #5a2430;
+  --brand-green-dark: #421a23;
+}
+
+/* UDFDB Agric Services — ochre/mustard, grain and investment coded. */
+body.theme-agric_services {
+  --brand-green: #5a4a1f;
+  --brand-green-dark: #423717;
+}
