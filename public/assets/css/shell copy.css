@@ -1,0 +1,652 @@
+/* ===========================================================
+   App shell — sidebar, header, footer
+   Shared by the super-admin and every company dashboard.
+
+   The sidebar section below is ported close to verbatim from a
+   reference implementation, with only two changes: color values
+   are pulled through --brand-green / --brand-green-dark (so the
+   per-company theming in themes.css keeps working automatically —
+   nothing there needed to change), and everything is scoped under
+   the .sidebar / .nm / .nm-link class convention that reference
+   uses, replacing the .app-sidebar / .sidebar-menu names from
+   before.
+
+   Header and footer intentionally stay on the white background
+   established earlier, NOT the reference's brand-colored header —
+   that was a specific instruction previously and this update didn't
+   ask to change it.
+   =========================================================== */
+
+:root {
+    --sidebar-w: 260px;
+    --sidebar-w-collapsed: 72px;
+    --header-h: 64px;
+    --footer-h: 52px;
+
+    /* Aliases so the sidebar gradient below reads from our existing
+     brand tokens (app.css) rather than hardcoded hex — this is what
+     makes themes.css's per-company overrides cascade into the
+     sidebar automatically with no changes needed there. */
+    --chrome-start: var(--brand-green-dark);
+    --chrome-end: var(--brand-green);
+}
+
+.app-shell {
+    position: relative;
+    min-height: 100vh;
+}
+
+/* -----------------------------------------------------------
+   Sidebar — full height, fixed, gradient brand color.
+   ----------------------------------------------------------- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    background: linear-gradient(180deg, var(--chrome-start) 0%, var(--chrome-end) 100%);
+    z-index: 1040;
+    display: flex;
+    flex-direction: column;
+    transition: width .28s cubic-bezier(.4, 0, .2, 1), background .2s ease;
+    box-shadow: 0 0 24px rgba(0, 0, 0, .12);
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-w-collapsed);
+}
+
+.sidebar-brand {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: 0 1.25rem;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+
+.sidebar.collapsed .sidebar-brand {
+    justify-content: center;
+    padding: 0;
+}
+
+.logo-mark {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, .25);
+    overflow: hidden;
+}
+
+.logo-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+}
+
+.brand-text {
+    color: #fff;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.brand-text strong {
+    font-family: var(--font-display);
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: .2px;
+    display: block;
+    line-height: 1.15;
+}
+
+.brand-text span {
+    font-size: .68rem;
+    color: rgba(255, 255, 255, .65);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.sidebar.collapsed .brand-text {
+    display: none;
+}
+
+.sidebar-nav-wrap {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: .85rem .65rem;
+}
+
+.sidebar-nav-wrap::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar-nav-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, .2);
+    border-radius: 4px;
+}
+
+.nav-section-label {
+    color: rgba(255, 255, 255, .45);
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: .9rem .75rem .35rem;
+}
+
+.sidebar.collapsed .nav-section-label {
+    display: none;
+}
+
+/* Menu — ul.nm > li > ul.nm > li > ... at any depth */
+.nm {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nm li {
+    margin-bottom: 4px;
+}
+
+.nm .nm-link {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .62rem .75rem;
+    margin-bottom: 2px;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, .82);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    font-weight: 500;
+    font-size: .875rem;
+    transition: background .15s ease, color .15s ease;
+    white-space: nowrap;
+}
+
+.nm-link:hover {
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+}
+
+.nm-link .nm-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 1.02rem;
+    flex-shrink: 0;
+}
+
+.nm-link .nm-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nm-link .nm-caret {
+    font-size: .72rem;
+    transition: transform .22s ease;
+    opacity: .7;
+    flex-shrink: 0;
+}
+
+.nm-link[aria-expanded="true"] .nm-caret {
+    transform: rotate(90deg);
+}
+
+.nm-link.active,
+.nm-link.active-parent {
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+}
+
+.nm-link.active {
+    font-weight: 700;
+    border-left: 3px solid var(--brand-gold);
+    padding-left: calc(.75rem - 3px);
+}
+
+.nm-children {
+    list-style: none;
+    margin: 2px 0 4px 0;
+    padding-left: 1.15rem;
+    position: relative;
+}
+
+.nm-children:before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 8px;
+    bottom: 10px;
+    width: 2px;
+    background: rgba(255, 255, 255, .15);
+}
+
+.nm-children .nm-link {
+    font-size: .825rem;
+    padding: .5rem .65rem;
+}
+
+.nm-children .nm-children {
+    padding-left: 1rem;
+}
+
+/* -----------------------------------------------------------
+   Collapsed sidebar (desktop) — icons + logo only.
+   ----------------------------------------------------------- */
+.sidebar.collapsed .nm-title,
+.sidebar.collapsed .nm-caret,
+.sidebar.collapsed .nav-section-label {
+    display: none;
+}
+
+.sidebar.collapsed .nm-link {
+    justify-content: center;
+    padding: .68rem 0;
+}
+
+.sidebar.collapsed .nm>li {
+    position: relative;
+}
+
+/*
+ * Collapsed-mode flyout menus.
+ *
+ * A submenu that lives inside .sidebar-nav-wrap (which scrolls, so
+ * it clips its contents) would get cut off if positioned absolutely
+ * within it. sidebar.js temporarily moves the open flyout's <ul> to
+ * be a direct child of <body> and adds the `.flyout-portal` class
+ * below — completely outside the clipped scroll container — then
+ * moves it back on close. These rules target that portalled state
+ * directly, with no dependency on `.sidebar` as an ancestor.
+ */
+.nm-children.flyout-portal {
+    display: block;
+    position: fixed;
+    min-width: 240px;
+    background: var(--chrome-start);
+    border-radius: 8px;
+    padding: .5rem;
+    margin: 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    z-index: 1055;
+}
+
+.nm-children.flyout-portal:before {
+    display: none;
+}
+
+/* Second-level (nested) submenu, inside a portalled first-level one */
+.nm-children.flyout-portal .nm-children {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 30px;
+    margin-left: -10px;
+    padding: .5rem;
+    background: var(--chrome-start);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+    min-width: 220px;
+    z-index: 1056;
+}
+
+.nm-children.flyout-portal .nm-children:before {
+    display: none;
+}
+
+.nm-children.flyout-portal li.has-children.flyout-open>.nm-children {
+    display: block;
+}
+
+.nm-children.flyout-portal .nm-link {
+    color: rgba(255, 255, 255, .82);
+    display: flex;
+    align-items: center;
+    line-height: 1.5;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nm-children.flyout-portal .nm-link:hover {
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+}
+
+.nm-children.flyout-portal li.has-children.flyout-open>a.nm-link {
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+}
+
+/* Single shared tooltip — one element reused for every collapsed
+   top-level leaf item (no children), instead of a duplicated hidden
+   element inside every link. sidebar.js positions and fills it. */
+#sidebarTooltip {
+    position: fixed;
+    z-index: 1070;
+    background: var(--ink);
+    color: #fff;
+    padding: .35rem .65rem;
+    border-radius: 6px;
+    font-size: .78rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-50%);
+    transition: opacity .12s ease;
+}
+
+#sidebarTooltip.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* -----------------------------------------------------------
+   Header — white background, fixed, offset by sidebar width.
+   ----------------------------------------------------------- */
+.app-header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: var(--sidebar-w);
+    height: var(--header-h);
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    z-index: 1030;
+    transition: left .28s cubic-bezier(.4, 0, .2, 1);
+}
+
+.sidebar.collapsed~.app-main .app-header {
+    left: var(--sidebar-w-collapsed);
+}
+
+.app-header__left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.app-header__logo {
+    display: none;
+    /* shown only on mobile — see media query below; the
+                     sidebar's own logo already covers desktop */
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.app-header__logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.app-header__toggle {
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.3rem;
+    width: 38px;
+    height: 38px;
+    border-radius: .5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.app-header__toggle:hover {
+    background: var(--paper);
+}
+
+.app-header__context {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--ink);
+}
+
+.app-header__right {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.app-header__icon-btn {
+    position: relative;
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 1.2rem;
+    width: 38px;
+    height: 38px;
+    border-radius: .5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-header__icon-btn:hover {
+    background: var(--paper);
+    color: var(--ink);
+}
+
+.app-notification-panel {
+    width: 300px;
+    padding: 0;
+    border: 1px solid var(--line);
+}
+
+.app-notification-panel__header {
+    padding: .75rem 1rem;
+    font-weight: 600;
+    font-size: .85rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.app-notification-panel__empty {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--ink-muted);
+}
+
+.app-notification-panel__empty i {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.app-notification-panel__empty p {
+    margin: 0;
+    font-size: .85rem;
+}
+
+.app-user-menu {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    border: none;
+    background: transparent;
+    padding: .3rem .5rem;
+    border-radius: .5rem;
+}
+
+.app-user-menu:hover {
+    background: var(--paper);
+}
+
+.app-user-menu__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--brand-green);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.app-user-menu__name {
+    font-size: .88rem;
+    font-weight: 500;
+    color: var(--ink);
+}
+
+.app-user-menu__caret {
+    font-size: .65rem;
+    color: var(--ink-muted);
+}
+
+.app-user-menu__panel {
+    width: 220px;
+}
+
+.app-user-menu__header {
+    padding: .5rem 1rem .25rem;
+}
+
+.app-user-menu__logout {
+    color: var(--danger);
+}
+
+.app-user-menu__logout:hover {
+    background: rgba(179, 65, 59, .08);
+    color: var(--danger);
+}
+
+/* -----------------------------------------------------------
+   Main / content / footer
+   ----------------------------------------------------------- */
+.app-main {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+    transition: margin-left .28s cubic-bezier(.4, 0, .2, 1);
+}
+
+.sidebar.collapsed~.app-main {
+    margin-left: var(--sidebar-w-collapsed);
+}
+
+.app-content {
+    margin-top: var(--header-h);
+    margin-bottom: var(--footer-h);
+    min-height: calc(100vh - var(--header-h) - var(--footer-h));
+    padding: 1.75rem;
+    background: var(--paper);
+}
+
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: var(--sidebar-w);
+    height: var(--footer-h);
+    background: #fff;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.5rem;
+    font-size: .8rem;
+    color: var(--ink-muted);
+    z-index: 1030;
+    transition: left .28s cubic-bezier(.4, 0, .2, 1);
+}
+
+.sidebar.collapsed~.app-main .app-footer {
+    left: var(--sidebar-w-collapsed);
+}
+
+/* .app-footer__meta { color: var(--line); } */
+
+/* -----------------------------------------------------------
+   Responsive — sidebar becomes an off-canvas drawer below 992px.
+   `.collapsed` (desktop icon-rail) and `.mobile-open` (mobile
+   reveal) are toggled together by the same button in sidebar.js;
+   each only has an effect within its own breakpoint below, so one
+   click handler correctly drives both behaviors.
+   ----------------------------------------------------------- */
+@media (max-width: 991.98px) {
+    .sidebar {
+        width: var(--sidebar-w-collapsed);
+    }
+
+    .sidebar:not(.mobile-open) {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+        width: var(--sidebar-w);
+    }
+
+    .app-header,
+    .app-footer {
+        left: 0 !important;
+    }
+
+    .app-main {
+        margin-left: 0 !important;
+    }
+
+    .app-content {
+        padding: 1.25rem;
+    }
+
+    /* Mobile header shows: logo, toggle, notification bell, avatar,
+     dropdown caret — context label and the user's name text are
+     dropped to fit everything in the available width. */
+    .app-header__logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .app-header__context {
+        display: none;
+    }
+
+    .app-user-menu__name {
+        display: none;
+    }
+}
+
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 16, 26, .45);
+    z-index: 1035;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease;
+}
+
+.sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (min-width: 992px) {
+    .sidebar-backdrop {
+        display: none;
+    }
+}

@@ -11,7 +11,7 @@ class Product extends Model
     use BelongsToCompany, HasUlids;
 
     protected $fillable = [
-        'company_id', 'category', 'name', 'sku', 'unit_price', 'attributes', 'is_active',
+        'company_id', 'category_id', 'name', 'sku', 'unit_price', 'attributes', 'is_active',
     ];
 
     protected $casts = [
@@ -19,6 +19,11 @@ class Product extends Model
         'attributes' => 'array',
         'is_active' => 'boolean',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class);
+    }
 
     public function orderItems()
     {

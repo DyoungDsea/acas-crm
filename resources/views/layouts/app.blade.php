@@ -49,47 +49,85 @@
     <div class="app-shell">
 
         <aside class="sidebar" id="appSidebar">
+
+            {{-- Sidebar Brand --}}
             <div class="sidebar-brand">
-                <div class="logo-mark">
-                    <img src="{{ asset('assets/images/acas-logo.png') }}" alt="{{ config('app.name', 'ACAS Group') }}">
-                </div>
-                <div class="brand-text">
-                    <strong>ACAS GROUP</strong>
-                    <span>Nigeria</span>
-                </div>
+
+                <a
+                    href="{{ isset($company)
+                ? route('company.dashboard', ['company' => $company->slug])
+                : route('super-admin.dashboard') }}"
+                    class="sidebar-brand__link">
+
+                    <div class="logo-mark">
+                        <img
+                            src="{{ asset('assets/images/acas-logo.png') }}"
+                            alt="{{ config('app.name', 'ACAS Group') }}">
+                    </div>
+
+                    <div class="brand-text">
+                        <strong>ACAS GROUP</strong>
+                        <span>Nigeria</span>
+                    </div>
+
+                </a>
+
             </div>
 
+
+            {{-- Sidebar Navigation --}}
             <nav class="sidebar-nav-wrap">
+
                 @once
                 @php
                 if (! function_exists('acasFilterMenuForCompany')) {
+
                 /**
-                * Removes any menu item tagged with a 'types' list
-                * that doesn't include this company's type — e.g.
-                * "Pharmacy stock" never appears for a farm. Recurses
-                * into children, and drops a parent entirely if every
-                * one of its children got filtered out and it isn't
-                * itself a real page (Operations, for a company with
-                * no matching vertical, e.g. Kezong Trading).
-                *
-                * This is a UX/relevance filter, NOT the security
-                * boundary — CompanyScope and ResolveCompanyTenant
-                * already block cross-company access at the query
-                * and URL level regardless of what the sidebar shows.
+                * Filter menu items according to company type.
                 */
-                function acasFilterMenuForCompany(array $items, ?string $companyType): array
-                {
+                function acasFilterMenuForCompany(
+                array $items,
+                ?string $companyType
+                ): array {
+
                 $filtered = [];
 
                 foreach ($items as $item) {
-                if (! empty($item['types']) && ! in_array($companyType, $item['types'], true)) {
+
+                /*
+                * Remove menu items that don't belong
+                * to this company type.
+                */
+                if (
+                !empty($item['types']) &&
+                !in_array(
+                $companyType,
+                $item['types'],
+                true
+                )
+                ) {
                 continue;
                 }
 
-                if (! empty($item['children'])) {
-                $item['children'] = acasFilterMenuForCompany($item['children'], $companyType);
+                /*
+                * Recursively filter children.
+                */
+                if (!empty($item['children'])) {
 
-                if (empty($item['children']) && empty($item['route'])) {
+                $item['children'] =
+                acasFilterMenuForCompany(
+                $item['children'],
+                $companyType
+                );
+
+                /*
+                * If a parent has no children and
+                * doesn't have its own route, remove it.
+                */
+                if (
+                empty($item['children']) &&
+                empty($item['route'])
+                ) {
                 continue;
                 }
                 }
@@ -102,25 +140,72 @@
                 }
                 @endphp
                 @endonce
+
+
                 @php
+
+                /*
+                * Start with the complete menu.
+                */
                 $effectiveMenu = $menu ?? [];
+
+
+                /*
+                * Filter menu according to company type.
+                */
                 if (isset($company)) {
-                $effectiveMenu = acasFilterMenuForCompany($effectiveMenu, $company->type);
+
+                $effectiveMenu =
+                acasFilterMenuForCompany(
+                $effectiveMenu,
+                $company->type
+                );
                 }
-                if (isset($company) && auth()->user()->is_super_admin) {
-                array_unshift($effectiveMenu, [
-                'label' => 'Super Admin overview',
+
+
+                /*
+                * Super admin shortcut.
+                */
+                if (
+                isset($company) &&
+                auth()->user()->is_super_admin
+                ) {
+
+                array_unshift(
+                $effectiveMenu,
+                [
+                'label' => 'Super Admin Overview',
                 'icon' => 'bi-arrow-left-circle',
                 'route' => 'super-admin.dashboard',
-                ]);
+                ]
+                );
                 }
+
                 @endphp
-                <x-sidebar-menu :items="$effectiveMenu" :default-params="isset($company) ? ['company' => $company->slug] : []" />
+
+
+                {{-- Dynamic menu component --}}
+                <x-sidebar-menu
+                    :items="$effectiveMenu"
+                    :default-params="
+                isset($company)
+                    ? ['company' => $company->slug]
+                    : []
+            " />
+
             </nav>
+
         </aside>
 
-        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        {{-- Mobile sidebar overlay --}}
+        <div
+            class="sidebar-backdrop"
+            id="sidebarBackdrop"></div>
+
         <div id="sidebarTooltip"></div>
+
+
 
         <div class="app-main">
 
@@ -171,9 +256,11 @@
                                     <i class="bi bi-key me-2"></i> Change password
                                 </button>
                             </li>
-                            @if (auth()->user()->is_super_admin || auth()->user()->hasRole('company_admin'))
+                            @if (isset($company) && (auth()->user()->is_super_admin || auth()->user()->hasRole('company_admin')))
                             <li>
-                                <a class="dropdown-item" href="#" data-coming-soon="1">
+                                <a
+                                    class="dropdown-item"
+                                    href="{{ route('company.settings.edit', ['company' => $company->slug]) }}">
                                     <i class="bi bi-gear me-2"></i> Settings
                                 </a>
                             </li>
@@ -244,8 +331,9 @@
                 @yield('content')
             </main>
 
-            <footer class="app-footer text-centerb">
-                <span>&copy; {{ date('Y') }} ACAS Group. All rights reserved.</span>
+            <footer class="app-footer text-center ">
+                &copy; {{ date('Y') }} ACAS Group. All rights reserved.
+
             </footer>
 
         </div>

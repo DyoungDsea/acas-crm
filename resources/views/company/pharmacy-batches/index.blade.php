@@ -2,7 +2,6 @@
 
 @section('title', 'Pharmacy Stock')
 
-
 @php
 $editingId = old('batch_id');
 @endphp
@@ -28,6 +27,7 @@ $editingId = old('batch_id');
                 <tr>
                     <th>S/N</th>
                     <th>Product</th>
+                    <th>Vendor</th>
                     <th>Batch #</th>
                     <th>Expiry</th>
                     <th>Qty received</th>
@@ -41,37 +41,39 @@ $editingId = old('batch_id');
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="fw-semibold">{{ $row->product->name ?? '—' }}</td>
+                    <td>{{ $row->vendorContact->name ?? '—' }}</td>
                     <td><code>{{ $row->batch_number }}</code></td>
                     <td>
                         {{ $row->expiry_date->format('M j, Y') }}
                         @if ($row->isExpired())
-                            <span class="badge text-bg-danger-subtle text-danger-emphasis ms-1">Expired</span>
+                        <span class="badge text-bg-danger-subtle text-danger-emphasis ms-1">Expired</span>
                         @endif
                     </td>
                     <td>{{ $row->quantity_received }}</td>
                     <td>{{ $row->quantity_remaining }}</td>
                     <td>
                         @php
-                            $statusClass = match ($row->status) {
-                                'active' => 'text-bg-success-subtle text-success-emphasis',
-                                'expired' => 'text-bg-danger-subtle text-danger-emphasis',
-                                'depleted' => 'text-bg-secondary-subtle text-secondary-emphasis',
-                                default => 'text-bg-light border',
-                            };
+                        $statusClass = match ($row->status) {
+                        'active' => 'text-bg-success-subtle text-success-emphasis',
+                        'expired' => 'text-bg-danger-subtle text-danger-emphasis',
+                        'depleted' => 'text-bg-secondary-subtle text-secondary-emphasis',
+                        default => 'text-bg-light border',
+                        };
                         @endphp
                         <span class="badge {{ $statusClass }}">{{ ucfirst($row->status) }}</span>
                     </td>
                     <td class="text-end no-export">
                         @php
-                            $batchPayload = [
-                                'id' => $row->id,
-                                'product_id' => $row->product_id,
-                                'batch_number' => $row->batch_number,
-                                'quantity_received' => $row->quantity_received,
-                                'expiry_date' => $row->expiry_date->format('Y-m-d'),
-                                'received_at' => $row->received_at->format('Y-m-d'),
-                                'status' => $row->status,
-                            ];
+                        $batchPayload = [
+                        'id' => $row->id,
+                        'product_id' => $row->product_id,
+                        'vendor_contact_id' => $row->vendor_contact_id,
+                        'batch_number' => $row->batch_number,
+                        'quantity_received' => $row->quantity_received,
+                        'expiry_date' => $row->expiry_date->format('Y-m-d'),
+                        'received_at' => $row->received_at->format('Y-m-d'),
+                        'status' => $row->status,
+                        ];
                         @endphp
                         <button type="button"
                             class="btn btn-sm btn-outline-secondary btn-edit-batch"
@@ -106,14 +108,32 @@ $editingId = old('batch_id');
                         <select class="form-select @error('product_id') is-invalid @enderror" id="batchProduct" name="product_id" required>
                             <option value="">&mdash; Select &mdash;</option>
                             @foreach ($products as $productOption)
-                                <option value="{{ $productOption->id }}" @selected(old('product_id') === $productOption->id)>
-                                    {{ $productOption->name }}
-                                </option>
+                            <option value="{{ $productOption->id }}" @selected(old('product_id')===$productOption->id)>
+                                {{ $productOption->name }}
+                            </option>
                             @endforeach
                         </select>
                         @error('product_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         @if ($products->isEmpty())
-                            <div class="form-text text-warning">No active products yet — add one under Products first.</div>
+                        <div class="form-text text-warning">No active products yet — add one under Products first.</div>
+                        @endif
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="batchVendor" class="form-label">Vendor <span class="text-muted fw-normal">(optional)</span></label>
+                        <select class="form-select @error('vendor_contact_id') is-invalid @enderror" id="batchVendor" name="vendor_contact_id">
+                            <option value="">— Not tracked —</option>
+                            @foreach ($vendors as $vendorOption)
+                            <option value="{{ $vendorOption->id }}" @selected(old('vendor_contact_id')===$vendorOption->id)>
+                                {{ $vendorOption->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('vendor_contact_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        @if ($vendors->isEmpty())
+                        <div class="form-text">
+                            No vendor contacts yet — add one under <a href="{{ route('company.contacts.index', ['company' => $company->slug]) }}">Contacts</a> (type: Vendor) to track suppliers here.
+                        </div>
                         @endif
                     </div>
 
@@ -136,7 +156,7 @@ $editingId = old('batch_id');
                             <label for="batchStatus" class="form-label">Status</label>
                             <select class="form-select @error('status') is-invalid @enderror" id="batchStatus" name="status" required>
                                 @foreach (['active' => 'Active', 'expired' => 'Expired', 'depleted' => 'Depleted'] as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('status') === $value)>{{ $label }}</option>
+                                <option value="{{ $value }}" @selected(old('status')===$value)>{{ $label }}</option>
                                 @endforeach
                             </select>
                             @error('status')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -172,15 +192,20 @@ $editingId = old('batch_id');
  
 <script>
     $(function() {
-        var columnPrint = [0, 1, 2, 3, 4, 5, 6];
+        var columnPrint = [0, 1, 2, 3, 4, 5, 6, 7];
         var printTitle = 'Pharmacy Stock - {{ $company->name }} - {{ date("d M, Y") }}';
         $('#batchesTable').DataTable({
             ordering: false,
             paging: false,
             info: false,
             responsive: true,
-            columnDefs: [{ targets: [0], orderable: false }],
-            language: { emptyTable: "No batches yet" },
+            columnDefs: [{
+                targets: [0],
+                orderable: false
+            }],
+            language: {
+                emptyTable: "No batches yet"
+            },
             dom: "<'row mb-3'" +
                 "<'col-lg-8 col-md-12 d-flex align-items-center gap-2 text-lg-start text-center mb-2 mb-lg-0'l f>" +
                 "<'col-lg-4 col-md-12 text-lg-end text-center mb-2 mb-lg-0'B>" +
@@ -190,11 +215,38 @@ $editingId = old('batch_id');
                 "<'col-md-6 col-12 text-md-start text-center'i>" +
                 "<'col-md-6 col-12 d-flex justify-content-md-end justify-content-center'p>" +
                 ">",
-            buttons: [
-                { extend: 'print', className: 'btn-info', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'csv', className: 'btn-primary', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'excel', className: 'btn-success', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'pdf', className: 'btn-warning', title: printTitle, exportOptions: { columns: columnPrint } },
+            buttons: [{
+                    extend: 'print',
+                    className: 'btn-info',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn-primary',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn-success',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn-warning',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
             ]
         });
 
@@ -220,6 +272,7 @@ $editingId = old('batch_id');
             $('#batchMethod').val('PUT');
             $('#batchIdField').val(batch.id);
             $('#batchProduct').val(batch.product_id);
+            $('#batchVendor').val(batch.vendor_contact_id || '');
             $('#batchNumber').val(batch.batch_number);
             $('#batchQuantity').val(batch.quantity_received);
             $('#batchStatus').val(batch.status);
@@ -234,8 +287,8 @@ $editingId = old('batch_id');
             openEditModal($(this).data('batch'));
         });
 
-        @if ($errors->any())
-            modal.show();
+        @if($errors -> any())
+        modal.show();
         @endif
     });
 </script>

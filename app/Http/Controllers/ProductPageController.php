@@ -5,20 +5,25 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductRequest;
 use App\Models\Company;
 use App\Models\Product;
+use App\Models\ProductCategory;
 
-// Products is a shared top-level menu item for every company
-// (unlike the type-restricted Operations branch) — a sack of rice,
-// a drug, a car part, and a solar kit are all just "products" with
-// a free-text category, per the original schema design.
+// Products is a shared top-level menu item for every company —
+// a sack of rice, a drug, a car part, and a solar kit are all just
+// "products", grouped by whatever categories that company has set
+// up under Products > Categories.
 class ProductPageController extends Controller
 {
     public function index(Company $company)
     {
-        $products = Product::where('company_id', $company->id)->orderBy('name')->get();
+        $products = Product::where('company_id', $company->id)
+            ->with('category')
+            ->orderBy('name')
+            ->get();
 
         return view('company.products.index', [
             'company' => $company,
             'products' => $products,
+            'categories' => ProductCategory::where('company_id', $company->id)->orderBy('name')->get(),
             'menu' => config('menus.company'),
             'contextLabel' => $company->name,
         ]);

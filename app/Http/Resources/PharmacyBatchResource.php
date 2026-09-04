@@ -12,6 +12,8 @@ class PharmacyBatchResource extends JsonResource
         return [
             'id' => $this->id,
             'product' => new ProductResource($this->whenLoaded('product')),
+            'vendor_contact_id' => $this->vendor_contact_id,
+            'vendor_contact' => new ContactResource($this->whenLoaded('vendorContact')),
             'batch_number' => $this->batch_number,
             'quantity_received' => $this->quantity_received,
             'quantity_remaining' => $this->quantity_remaining,

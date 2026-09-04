@@ -10,11 +10,28 @@ class Company extends Model
     use HasUlids;
 
     protected $fillable = [
-        'name', 'slug', 'type', 'logo_path', 'address', 'phone', 'email', 'is_active',
+        'name',
+        'slug',
+        'type',
+        'logo_path',
+        'address',
+        'phone',
+        'email',
+        'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+    ];
+
+
+    public const PIPELINE_ENABLED_TYPES = [
+        'farms',
+        'properties',
+        'trading',
+        'energy',
+        'automotive',
+        'agric_services',
     ];
 
     public function paymentSetting()

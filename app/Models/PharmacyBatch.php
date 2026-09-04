@@ -11,8 +11,15 @@ class PharmacyBatch extends Model
     use BelongsToCompany, HasUlids;
 
     protected $fillable = [
-        'company_id', 'product_id', 'batch_number', 'quantity_received',
-        'quantity_remaining', 'expiry_date', 'received_at', 'status',
+        'company_id',
+        'product_id',
+        'vendor_contact_id',
+        'batch_number',
+        'quantity_received',
+        'quantity_remaining',
+        'expiry_date',
+        'received_at',
+        'status',
     ];
 
     protected $casts = [
@@ -23,6 +30,11 @@ class PharmacyBatch extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function vendorContact()
+    {
+        return $this->belongsTo(Contact::class, 'vendor_contact_id');
     }
 
     public function isExpired(): bool

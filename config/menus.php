@@ -13,9 +13,16 @@
 // values (see the Company model's themeKey()/type column) — used on
 // the "Operations" branch below so a pharmacy doesn't see "Vehicles
 // & bookings" and a farm doesn't see "Pharmacy stock". Items with no
-// 'types' key are shown to every company. Filtering happens in
-// layouts/app.blade.php via acasFilterMenuForCompany(), not here —
-// this file stays pure data.
+// 'types' key are shown to every company.
+//
+// 'adminOnly' => true hides an item from plain staff — used on
+// "Team" below, since staff/settings management is a company_admin
+// concern. This is a UX convenience so staff never see a link that
+// would 403 — the actual enforcement is the 'company_admin'
+// middleware on those routes (see routes/web.php), not this file.
+//
+// Filtering for both happens in layouts/app.blade.php via
+// acasFilterMenuForCompany() — this file stays pure data.
 //
 // IMPORTANT: only put routes here that every viewer of this menu is
 // actually allowed to visit. The 'company' menu is shared by staff,
@@ -50,8 +57,8 @@ return [
             'icon' => 'bi-cash-stack',
             'route' => null,
             'children' => [
-                ['label' => 'Pipelines', 'route' => null],
-                ['label' => 'Deals', 'route' => null],
+                ['label' => 'Pipelines', 'route' => 'company.pipelines.index', 'types' => \App\Models\Company::PIPELINE_ENABLED_TYPES],
+                ['label' => 'Deals', 'route' => 'company.deals.index', 'types' => \App\Models\Company::PIPELINE_ENABLED_TYPES],
                 [
                     'label' => 'Orders',
                     'route' => null,
@@ -63,7 +70,15 @@ return [
                 ],
             ],
         ],
-        ['label' => 'Products', 'icon' => 'bi-box-seam', 'route' => 'company.products.index'],
+        [
+            'label' => 'Products',
+            'icon' => 'bi-box-seam',
+            'route' => null,
+            'children' => [
+                ['label' => 'All products', 'route' => 'company.products.index'],
+                ['label' => 'Categories', 'route' => 'company.product-categories.index'],
+            ],
+        ],
         [
             'label' => 'Operations',
             'icon' => 'bi-diagram-3',
@@ -81,6 +96,7 @@ return [
             'label' => 'Team',
             'icon' => 'bi-person-badge',
             'route' => null,
+            'adminOnly' => true,
             'children' => [
                 ['label' => 'Staff', 'route' => 'company.staff.index'],
                 ['label' => 'Company settings', 'route' => 'company.settings.edit'],
@@ -89,4 +105,3 @@ return [
     ],
 
 ];
-

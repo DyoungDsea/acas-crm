@@ -1,81 +1,93 @@
-/* ===========================================================
-   App shell — sidebar, header, footer
-   Shared by the super-admin and every company dashboard.
+/* =========================================================
+   ACAS APPLICATION SHELL
+   Bootstrap 5 compatible
 
-   The sidebar section below is ported close to verbatim from a
-   reference implementation, with only two changes: color values
-   are pulled through --brand-green / --brand-green-dark (so the
-   per-company theming in themes.css keeps working automatically —
-   nothing there needed to change), and everything is scoped under
-   the .sidebar / .nm / .nm-link class convention that reference
-   uses, replacing the .app-sidebar / .sidebar-menu names from
-   before.
-
-   Header and footer intentionally stay on the white background
-   established earlier, NOT the reference's brand-colored header —
-   that was a specific instruction previously and this update didn't
-   ask to change it.
-   =========================================================== */
+   Color note: this file now reads its palette from the
+   --brand-* tokens defined in themes.css (:root), with
+   fallbacks so it still renders sensibly if themes.css
+   isn't loaded. This is what keeps the app shell visually
+   in sync with the auth screens instead of shipping its
+   own separate blue accent.
+========================================================= */
 
 :root {
-    --sidebar-w: 260px;
-    --sidebar-w-collapsed: 72px;
-    --header-h: 64px;
-    --footer-h: 52px;
+    --acas-sidebar-width: 270px;
+    --acas-sidebar-collapsed-width: 78px;
 
-    /* Aliases so the sidebar gradient below reads from our existing
-     brand tokens (app.css) rather than hardcoded hex — this is what
-     makes themes.css's per-company overrides cascade into the
-     sidebar automatically with no changes needed there. */
-    --chrome-start: var(--brand-green-dark);
-    --chrome-end: var(--brand-green);
+    --acas-border: var(--line, #e4e0d6);
+    --acas-text: var(--ink-muted, #5b6660);
+    --acas-muted: #8a9089;
+    --acas-hover: #f4f2ec;
+    --acas-active: rgba(31, 58, 46, 0.08);
+
+    --acas-primary: var(--brand-green, #1f3a2e);
+    --acas-primary-dark: var(--brand-green-dark, #14251d);
+    --acas-accent: var(--brand-gold, #c99a3f);
+
+    --acas-header-height: 68px;
 }
+
+
+/* =========================================================
+   APPLICATION SHELL
+========================================================= */
 
 .app-shell {
-    position: relative;
     min-height: 100vh;
+    display: flex;
+    background: var(--paper, #f7f5f0);
 }
 
-/* -----------------------------------------------------------
-   Sidebar — full height, fixed, gradient brand color.
-   ----------------------------------------------------------- */
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: var(--sidebar-w);
-    background: linear-gradient(180deg, var(--chrome-start) 0%, var(--chrome-end) 100%);
+    width: var(--acas-sidebar-width);
+    background: linear-gradient(180deg, var(--acas-primary-dark) 0%, var(--acas-primary) 100%);
     z-index: 1040;
     display: flex;
     flex-direction: column;
     transition: width .28s cubic-bezier(.4, 0, .2, 1), background .2s ease;
     box-shadow: 0 0 24px rgba(0, 0, 0, .12);
+    overflow: hidden;
 }
 
-.sidebar.collapsed {
-    width: var(--sidebar-w-collapsed);
-}
+
+/* =========================================================
+   SIDEBAR BRAND
+========================================================= */
 
 .sidebar-brand {
-    height: var(--header-h);
+    height: var(--acas-header-height);
     display: flex;
     align-items: center;
     gap: .65rem;
-    padding: 0 1.25rem;
+    padding: 0 20px;
     flex-shrink: 0;
     border-bottom: 1px solid rgba(255, 255, 255, .12);
+
 }
 
-.sidebar.collapsed .sidebar-brand {
-    justify-content: center;
-    padding: 0;
+
+.sidebar-brand__link {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
 }
+
 
 .logo-mark {
     width: 50px;
     height: 50px;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -84,6 +96,7 @@
     overflow: hidden;
 }
 
+
 .logo-mark img {
     width: 100%;
     height: 100%;
@@ -91,20 +104,29 @@
     padding: 4px;
 }
 
+
 .brand-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+
     color: #fff;
     overflow: hidden;
     white-space: nowrap;
 }
 
+
 .brand-text strong {
-    font-family: var(--font-display);
+    color: white;
+    font-family: var(--font-display, inherit);
     font-size: 1.02rem;
     font-weight: 700;
     letter-spacing: .2px;
     display: block;
     line-height: 1.15;
 }
+
 
 .brand-text span {
     font-size: .68rem;
@@ -113,541 +135,833 @@
     letter-spacing: 1.2px;
 }
 
-.sidebar.collapsed .brand-text {
-    display: none;
-}
+
+/* =========================================================
+   NAVIGATION WRAPPER
+========================================================= */
 
 .sidebar-nav-wrap {
     flex: 1;
+    padding: 18px 12px 24px;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: .85rem .65rem;
 }
+
+
+/* Scrollbar */
 
 .sidebar-nav-wrap::-webkit-scrollbar {
     width: 5px;
 }
 
+.sidebar-nav-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 .sidebar-nav-wrap::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, .2);
-    border-radius: 4px;
+    background: #dcd7c9;
+    border-radius: 20px;
 }
 
-.nav-section-label {
-    color: rgba(255, 255, 255, .45);
-    font-size: .68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    padding: .9rem .75rem .35rem;
-}
 
-.sidebar.collapsed .nav-section-label {
-    display: none;
-}
+/* =========================================================
+   RESET MENU
+========================================================= */
 
-/* Menu — ul.nm > li > ul.nm > li > ... at any depth */
-.nm {
+.sidebar ul {
+    margin: 0;
+    padding: 0;
     list-style: none;
+}
+
+
+.sidebar li {
     margin: 0;
     padding: 0;
 }
 
-.nm li {
-    margin-bottom: 4px;
-}
 
-.nm .nm-link {
+/* =========================================================
+   MAIN MENU LINKS
+========================================================= */
+
+.sidebar .nm-link {
+    position: relative;
+    width: 100%;
+    min-height: 44px;
     display: flex;
     align-items: center;
-    gap: .75rem;
-    padding: .62rem .75rem;
-    margin-bottom: 2px;
-    border-radius: 6px;
+    gap: 12px;
+    padding: 10px 13px;
+    margin: 2px 0;
+    border-radius: 4px;
     color: rgba(255, 255, 255, .82);
-    text-decoration: none;
-    cursor: pointer;
-    position: relative;
+    font-size: 13.5px;
     font-weight: 500;
-    font-size: .875rem;
-    transition: background .15s ease, color .15s ease;
-    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.nm-link:hover {
-    background: rgba(255, 255, 255, .1);
-    color: #fff;
-}
 
-.nm-link .nm-icon {
+/* Icons */
+
+.sidebar .nm-icon {
     width: 20px;
-    text-align: center;
-    font-size: 1.02rem;
-    flex-shrink: 0;
+    min-width: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b9187;
+    font-size: 17px;
+    transition: color 0.18s ease;
 }
 
-.nm-link .nm-title {
+
+/* Menu title */
+
+.sidebar .nm-title {
     flex: 1;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.nm-link .nm-caret {
-    font-size: .72rem;
-    transition: transform .22s ease;
-    opacity: .7;
-    flex-shrink: 0;
+
+/* Caret */
+
+.sidebar .nm-caret {
+    margin-left: auto;
+    color: #a3a89c;
+    font-size: 12px;
+    transition: transform 0.2s ease;
 }
 
-.nm-link[aria-expanded="true"] .nm-caret {
-    transform: rotate(90deg);
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.sidebar .nm-link:hover {
+    color: var(--ink, #172019);
+    background: var(--acas-hover);
 }
 
-.nm-link.active,
-.nm-link.active-parent {
+
+.sidebar .nm-link:hover .nm-icon {
+    color: var(--acas-primary);
+}
+
+
+/* =========================================================
+   ACTIVE MENU
+========================================================= */
+
+.sidebar .nm-link.active {
     background: rgba(255, 255, 255, .16);
     color: #fff;
+    font-weight: 600;
 }
 
-.nm-link.active {
-    font-weight: 700;
-    border-left: 3px solid var(--brand-gold);
-    padding-left: calc(.75rem - 3px);
+
+.sidebar .nm-link.active .nm-icon {
+    color: var(--acas-primary);
 }
 
-.nm-children {
-    list-style: none;
-    margin: 2px 0 4px 0;
-    padding-left: 1.15rem;
-    position: relative;
-}
-
-.nm-children:before {
-    content: '';
-    position: absolute;
-    left: 9px;
-    top: 8px;
-    bottom: 10px;
-    width: 2px;
-    background: rgba(255, 255, 255, .15);
-}
-
-.nm-children .nm-link {
-    font-size: .825rem;
-    padding: .5rem .65rem;
-}
-
-.nm-children .nm-children {
-    padding-left: 1rem;
-}
-
-/* -----------------------------------------------------------
-   Collapsed sidebar (desktop) — icons + logo only.
-   ----------------------------------------------------------- */
-.sidebar.collapsed .nm-title,
-.sidebar.collapsed .nm-caret,
-.sidebar.collapsed .nav-section-label {
-    display: none;
-}
-
-.sidebar.collapsed .nm-link {
-    justify-content: center;
-    padding: .68rem 0;
-}
-
-.sidebar.collapsed .nm>li {
-    position: relative;
-}
 
 /*
- * Collapsed-mode flyout menus.
- *
- * A submenu that lives inside .sidebar-nav-wrap (which scrolls, so
- * it clips its contents) would get cut off if positioned absolutely
- * within it. sidebar.js temporarily moves the open flyout's <ul> to
- * be a direct child of <body> and adds the `.flyout-portal` class
- * below — completely outside the clipped scroll container — then
- * moves it back on close. These rules target that portalled state
- * directly, with no dependency on `.sidebar` as an ancestor.
+ * Active indicator uses the gold accent so it reads
+ * distinctly from the green "active" text/background above
+ * it, rather than the same hue at two strengths.
  */
-.nm-children.flyout-portal {
-    display: block;
-    position: fixed;
-    min-width: 240px;
-    background: var(--chrome-start);
-    border-radius: 8px;
-    padding: .5rem;
-    margin: 0;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
-    z-index: 1055;
-}
-
-.nm-children.flyout-portal:before {
-    display: none;
-}
-
-/* Second-level (nested) submenu, inside a portalled first-level one */
-.nm-children.flyout-portal .nm-children {
-    display: none;
+.sidebar .nm-link.active::before {
+    content: "";
     position: absolute;
-    left: 100%;
-    top: 30px;
-    margin-left: -10px;
-    padding: .5rem;
-    background: var(--chrome-start);
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
-    min-width: 220px;
-    z-index: 1056;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 4px 4px 0;
+    background: var(--acas-accent);
 }
 
-.nm-children.flyout-portal .nm-children:before {
-    display: none;
+
+/* =========================================================
+   ACTIVE PARENT
+========================================================= */
+
+.sidebar .nm-link.active-parent {
+    color: var(--ink, #172019);
+    background: #f4f2ec;
+    font-weight: 600;
 }
 
-.nm-children.flyout-portal li.has-children.flyout-open>.nm-children {
-    display: block;
+
+.sidebar .nm-link.active-parent .nm-icon {
+    color: var(--acas-primary);
 }
 
-.nm-children.flyout-portal .nm-link {
-    color: rgba(255, 255, 255, .82);
+
+/* Rotate caret when parent is open */
+
+.sidebar .nm-link[aria-expanded="true"] .nm-caret {
+    transform: rotate(90deg);
+    color: var(--acas-primary);
+}
+
+
+/* =========================================================
+   SUB MENUS
+========================================================= */
+
+.sidebar .nm.collapse {
+    padding: 4px 0 5px 18px;
+    margin-left: 10px;
+    border-left: 1px solid var(--acas-border);
+}
+
+
+/* Nested menu link */
+
+.sidebar .nm.collapse .nm-link {
+    min-height: 39px;
+    padding: 8px 11px;
+    margin: 1px 0;
+    border-radius: 7px;
+    font-size: 13px;
+}
+
+
+.sidebar .nm.collapse .nm-link .nm-icon {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   NESTED SUBMENU
+========================================================= */
+
+.sidebar .nm .nm .nm-link {
+    font-size: 12.5px;
+    padding-left: 10px;
+}
+
+
+.sidebar .nm .nm {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px dashed #d8d3c6;
+}
+
+
+/* =========================================================
+   COMING SOON
+========================================================= */
+
+.sidebar .nm-link[data-coming-soon="1"] {
+    cursor: not-allowed;
+    opacity: 0.58;
+}
+
+
+.sidebar .nm-link[data-coming-soon="1"]:hover {
+    color: var(--acas-text);
+    background: transparent;
+}
+
+
+.sidebar .nm-link[data-coming-soon="1"]::after {
+    content: "Soon";
+    margin-left: auto;
+    padding: 3px 6px;
+    border-radius: 5px;
+    background: #f1efe7;
+    color: #8b9187;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.app-main {
+    width: calc(100% - var(--acas-sidebar-width));
+    min-height: 100vh;
+    margin-left: var(--acas-sidebar-width);
     display: flex;
-    align-items: center;
-    line-height: 1.5;
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex-direction: column;
+    transition: margin-left 0.25s ease, width 0.25s ease;
 }
 
-.nm-children.flyout-portal .nm-link:hover {
-    background: rgba(255, 255, 255, .1);
-    color: #fff;
-}
 
-.nm-children.flyout-portal li.has-children.flyout-open>a.nm-link {
-    background: rgba(255, 255, 255, .1);
-    color: #fff;
-}
+/* =========================================================
+   HEADER
 
-/* Single shared tooltip — one element reused for every collapsed
-   top-level leaf item (no children), instead of a duplicated hidden
-   element inside every link. sidebar.js positions and fills it. */
-#sidebarTooltip {
-    position: fixed;
-    z-index: 1070;
-    background: var(--ink);
-    color: #fff;
-    padding: .35rem .65rem;
-    border-radius: 6px;
-    font-size: .78rem;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-50%);
-    transition: opacity .12s ease;
-}
+   Redesign notes:
+   - swapped the plain white/blur bar for the paper tone so
+     it sits quietly against the content instead of fighting
+     the sidebar's white
+   - added a 2px gold rule along the bottom, echoing the same
+     accent line used on the auth panel, so the app shell and
+     the login screen read as one product
+   - icon buttons now pick up the brand green on hover/focus
+     instead of a neutral grey, and the notification bell
+     gets a resting dot so an unread state has somewhere to
+     attach later
+========================================================= */
 
-#sidebarTooltip.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* -----------------------------------------------------------
-   Header — white background, fixed, offset by sidebar width.
-   ----------------------------------------------------------- */
 .app-header {
-    position: fixed;
+    position: sticky;
     top: 0;
-    right: 0;
-    left: var(--sidebar-w);
-    height: var(--header-h);
-    background: #fff;
-    border-bottom: 1px solid var(--line);
+    z-index: 1020;
+    height: var(--acas-header-height);
+    padding: 0 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1.5rem;
-    z-index: 1030;
-    transition: left .28s cubic-bezier(.4, 0, .2, 1);
+    background: #fff;
+    border-bottom: 1px solid var(--acas-primary-dark);
+    backdrop-filter: blur(8px);
 }
 
-.sidebar.collapsed~.app-main .app-header {
-    left: var(--sidebar-w-collapsed);
-}
 
-.app-header__left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.app-header__logo {
-    display: none;
-    /* shown only on mobile — see media query below; the
-                     sidebar's own logo already covers desktop */
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-}
-
-.app-header__logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.app-header__toggle {
-    border: none;
-    background: transparent;
-    color: var(--ink);
-    font-size: 1.3rem;
-    width: 38px;
-    height: 38px;
-    border-radius: .5rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.app-header__toggle:hover {
-    background: var(--paper);
-}
-
-.app-header__context {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.05rem;
-    color: var(--ink);
-}
-
+.app-header__left,
 .app-header__right {
     display: flex;
     align-items: center;
-    gap: .5rem;
 }
+
+
+.app-header__left {
+    gap: 15px;
+}
+
+
+.app-header__right {
+    gap: 6px;
+}
+
+
+/* =========================================================
+   HEADER LOGO
+========================================================= */
+
+.app-header__logo {
+    display: none;
+}
+
+.app-header__logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   SIDEBAR TOGGLE
+========================================================= */
+
+.app-header__toggle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--acas-primary);
+    font-size: 21px;
+    transition: background 0.2s ease;
+}
+
+
+.app-header__toggle:hover,
+.app-header__toggle:focus-visible {
+    background: rgba(31, 58, 46, 0.08);
+}
+
+
+/* =========================================================
+   HEADER CONTEXT
+========================================================= */
+
+.app-header__context {
+    color: var(--ink, #172019);
+    font-family: var(--font-display, inherit);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   HEADER ICON BUTTON
+========================================================= */
 
 .app-header__icon-btn {
     position: relative;
-    border: none;
-    background: transparent;
-    color: var(--ink-muted);
-    font-size: 1.2rem;
-    width: 38px;
-    height: 38px;
-    border-radius: .5rem;
+    width: 40px;
+    height: 40px;
+    padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-muted, #5b6660);
+    font-size: 18px;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.app-header__icon-btn:hover {
-    background: var(--paper);
-    color: var(--ink);
+
+.app-header__icon-btn:hover,
+.app-header__icon-btn:focus-visible {
+    background: rgba(31, 58, 46, 0.08);
+    color: var(--acas-primary);
 }
+
+
+/* =========================================================
+   USER MENU
+========================================================= */
+
+.app-user-menu {
+    border: 0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 8px;
+    border-radius: 9px;
+    transition: background 0.2s ease;
+}
+
+
+.app-user-menu:hover,
+.app-user-menu:focus-visible {
+    background: rgba(31, 58, 46, 0.06);
+}
+
+
+.app-user-menu__avatar {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--acas-primary);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.app-user-menu__name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ink, #172019);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.app-user-menu__caret {
+    color: var(--acas-muted);
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   DROPDOWN
+========================================================= */
+
+.app-user-menu__panel,
+.app-notification-panel {
+    margin-top: 8px !important;
+    border: 1px solid var(--acas-border);
+    border-radius: 4px;
+    box-shadow: 0 12px 35px rgba(23, 32, 25, 0.12);
+    overflow: hidden;
+}
+
+
+/* User dropdown */
+
+.app-user-menu__panel {
+    width: 240px;
+    padding: 7px;
+}
+
+
+.app-user-menu__header {
+    padding: 10px 12px;
+}
+
+
+/* =========================================================
+   NOTIFICATION PANEL
+========================================================= */
 
 .app-notification-panel {
-    width: 300px;
+    width: 320px;
     padding: 0;
-    border: 1px solid var(--line);
 }
+
 
 .app-notification-panel__header {
-    padding: .75rem 1rem;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--acas-border);
+    color: var(--ink, #172019);
+    font-size: 14px;
     font-weight: 600;
-    font-size: .85rem;
-    border-bottom: 1px solid var(--line);
 }
+
 
 .app-notification-panel__empty {
-    padding: 2rem 1rem;
+    min-height: 150px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    color: var(--ink-muted);
+    color: var(--acas-muted);
 }
 
+
 .app-notification-panel__empty i {
-    font-size: 1.5rem;
-    display: block;
-    margin-bottom: .5rem;
+    margin-bottom: 10px;
+    font-size: 28px;
+    color: var(--acas-accent);
 }
+
 
 .app-notification-panel__empty p {
     margin: 0;
-    font-size: .85rem;
+    font-size: 13px;
 }
 
-.app-user-menu {
-    display: flex;
-    align-items: center;
-    gap: .55rem;
-    border: none;
-    background: transparent;
-    padding: .3rem .5rem;
-    border-radius: .5rem;
-}
 
-.app-user-menu:hover {
-    background: var(--paper);
-}
-
-.app-user-menu__avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--brand-green);
-    color: #fff;
-    font-size: .78rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.app-user-menu__name {
-    font-size: .88rem;
-    font-weight: 500;
-    color: var(--ink);
-}
-
-.app-user-menu__caret {
-    font-size: .65rem;
-    color: var(--ink-muted);
-}
-
-.app-user-menu__panel {
-    width: 220px;
-}
-
-.app-user-menu__header {
-    padding: .5rem 1rem .25rem;
-}
-
-.app-user-menu__logout {
-    color: var(--danger);
-}
-
-.app-user-menu__logout:hover {
-    background: rgba(179, 65, 59, .08);
-    color: var(--danger);
-}
-
-/* -----------------------------------------------------------
-   Main / content / footer
-   ----------------------------------------------------------- */
-.app-main {
-    margin-left: var(--sidebar-w);
-    min-height: 100vh;
-    transition: margin-left .28s cubic-bezier(.4, 0, .2, 1);
-}
-
-.sidebar.collapsed~.app-main {
-    margin-left: var(--sidebar-w-collapsed);
-}
+/* =========================================================
+   PAGE CONTENT
+========================================================= */
 
 .app-content {
-    margin-top: var(--header-h);
-    margin-bottom: var(--footer-h);
-    min-height: calc(100vh - var(--header-h) - var(--footer-h));
-    padding: 1.75rem;
-    background: var(--paper);
+    flex: 1;
+    padding: 24px;
 }
+
+
+/* =========================================================
+   FOOTER
+
+   Redesign notes:
+   - dropped the near-invisible grey caption bar for a solid
+     brand-green footer, matching the auth panel so the shell
+     feels bookended by the same identity
+   - split into two zones (copyright + quick links) instead
+     of one lonely line of text, using the same link tokens
+     as the rest of the app rather than inventing new ones
+========================================================= */
 
 .app-footer {
+    padding: 16px 24px;
+    background: white;
+    color: var(--ink-muted, #5b6660);
+    font-size: 12.5px;
+}
+
+
+
+/* =========================================================
+   SIDEBAR BACKDROP
+========================================================= */
+
+.sidebar-backdrop {
+    display: none;
     position: fixed;
-    bottom: 0;
-    right: 0;
-    left: var(--sidebar-w);
-    height: var(--footer-h);
-    background: #fff;
-    border-top: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 1.5rem;
-    font-size: .8rem;
-    color: var(--ink-muted);
-    z-index: 1030;
-    transition: left .28s cubic-bezier(.4, 0, .2, 1);
+    inset: 0;
+    z-index: 1035;
+    background: rgba(23, 32, 25, 0.45);
 }
 
-.sidebar.collapsed~.app-main .app-footer {
-    left: var(--sidebar-w-collapsed);
-}
 
-/* .app-footer__meta { color: var(--line); } */
+/* =========================================================
+   COLLAPSED DESKTOP SIDEBAR
+========================================================= */
 
-/* -----------------------------------------------------------
-   Responsive — sidebar becomes an off-canvas drawer below 992px.
-   `.collapsed` (desktop icon-rail) and `.mobile-open` (mobile
-   reveal) are toggled together by the same button in sidebar.js;
-   each only has an effect within its own breakpoint below, so one
-   click handler correctly drives both behaviors.
-   ----------------------------------------------------------- */
-@media (max-width: 991.98px) {
-    .sidebar {
-        width: var(--sidebar-w-collapsed);
+@media (min-width: 992px) {
+
+    /*
+     * These classes are toggled by sidebar.js when the
+     * user collapses the sidebar on desktop.
+     */
+
+    .app-shell.sidebar-collapsed .sidebar {
+        width: var(--acas-sidebar-collapsed-width);
     }
 
-    .sidebar:not(.mobile-open) {
-        transform: translateX(-100%);
+    .app-shell.sidebar-collapsed .app-main {
+        width: calc(100% - var(--acas-sidebar-collapsed-width));
+
+        margin-left: var(--acas-sidebar-collapsed-width);
     }
 
-    .sidebar.mobile-open {
-        transform: translateX(0);
-        width: var(--sidebar-w);
+    .app-shell.sidebar-collapsed .brand-text,
+    .app-shell.sidebar-collapsed .nm-title,
+    .app-shell.sidebar-collapsed .nm-caret,
+    .app-shell.sidebar-collapsed .sidebar .nm-link::after {
+        display: none;
     }
 
-    .app-header,
-    .app-footer {
-        left: 0 !important;
+    .app-shell.sidebar-collapsed .sidebar-brand {
+        justify-content: center;
+
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
-    .app-main {
-        margin-left: 0 !important;
-    }
-
-    .app-content {
-        padding: 1.25rem;
-    }
-
-    /* Mobile header shows: logo, toggle, notification bell, avatar,
-     dropdown caret — context label and the user's name text are
-     dropped to fit everything in the available width. */
-    .app-header__logo {
-        display: flex;
-        align-items: center;
+    .app-shell.sidebar-collapsed .sidebar-brand__link {
         justify-content: center;
     }
 
-    .app-header__context {
-        display: none;
+    .app-shell.sidebar-collapsed .sidebar .nm-link {
+        justify-content: center;
+
+        padding-left: 0;
+        padding-right: 0;
     }
+
+    .app-shell.sidebar-collapsed .sidebar .nm-icon {
+        margin: 0;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar .nm.collapse {
+        display: none !important;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1199.98px) {
+
+    .app-header {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .app-content {
+        padding: 20px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .sidebar {
+        width: var(--acas-sidebar-width);
+
+        transform: translateX(-100%);
+
+        box-shadow:
+            10px 0 30px rgba(23, 32, 25, 0.12);
+    }
+
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+
+    .app-main {
+        width: 100%;
+
+        margin-left: 0;
+    }
+
+
+    .app-header__logo {
+        display: inline-flex;
+        align-items: center;
+    }
+
+
+    .app-header__context {
+        max-width: 180px;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .sidebar-backdrop.show {
+        display: block;
+    }
+
 
     .app-user-menu__name {
         display: none;
     }
+
+
+    .app-content {
+        padding: 16px;
+    }
+
+
+    .app-footer {
+        padding: 14px 16px;
+        justify-content: center;
+        text-align: center;
+    }
+
 }
 
-.sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 16, 26, .45);
-    z-index: 1035;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .2s ease;
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 575.98px) {
+
+    .app-header {
+        padding: 0 12px;
+    }
+
+
+    .app-header__left {
+        gap: 8px;
+    }
+
+
+    .app-header__context {
+        font-size: 13px;
+        max-width: 120px;
+    }
+
+
+    .app-notification-panel {
+        width: min(320px, calc(100vw - 24px));
+    }
+
+
+    .app-footer__links {
+        gap: 12px;
+    }
+
 }
 
-.sidebar-backdrop.show {
-    opacity: 1;
-    visibility: visible;
+
+/* =========================================================
+   SIDEBAR TOGGLE SUPPORT
+   Add this at the very bottom of shell.css
+========================================================= */
+
+/* Smooth sidebar transition */
+.sidebar {
+    transition:
+        width 0.28s cubic-bezier(.4, 0, .2, 1),
+        transform 0.28s cubic-bezier(.4, 0, .2, 1);
 }
 
+.app-main {
+    transition:
+        margin-left 0.28s cubic-bezier(.4, 0, .2, 1),
+        width 0.28s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Keep the toggle button above everything in the header */
+.app-header__toggle {
+    position: relative;
+    z-index: 1050;
+    cursor: pointer;
+}
+
+/* Desktop collapsed state */
 @media (min-width: 992px) {
-    .sidebar-backdrop {
+
+    .app-shell.sidebar-collapsed .sidebar {
+        width: var(--acas-sidebar-collapsed-width);
+    }
+
+    .app-shell.sidebar-collapsed .app-main {
+        width: calc(100% - var(--acas-sidebar-collapsed-width));
+        margin-left: var(--acas-sidebar-collapsed-width);
+    }
+
+    .app-shell.sidebar-collapsed .sidebar-brand {
+        padding-left: 10px;
+        padding-right: 10px;
+        justify-content: center;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar-brand__link {
+        justify-content: center;
+    }
+
+    .app-shell.sidebar-collapsed .brand-text,
+    .app-shell.sidebar-collapsed .nm-title,
+    .app-shell.sidebar-collapsed .nm-caret {
         display: none;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar .nm-link {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .app-shell.sidebar-collapsed .sidebar .nm-icon {
+        margin: 0;
+    }
+
+    /* Hide submenu when sidebar is collapsed */
+    .app-shell.sidebar-collapsed .sidebar .nm.collapse {
+        display: none !important;
+    }
+}
+
+/* Mobile sidebar */
+@media (max-width: 991.98px) {
+
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            opacity 0.25s ease,
+            visibility 0.25s ease;
+    }
+
+    .sidebar-backdrop.show {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    body.sidebar-open {
+        overflow: hidden;
     }
 }

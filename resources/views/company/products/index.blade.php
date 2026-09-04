@@ -2,6 +2,7 @@
 
 @section('title', 'Products')
 
+ 
 
 @php
 $editingId = old('product_id');
@@ -38,7 +39,13 @@ $editingId = old('product_id');
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="fw-semibold">{{ $row->name }}</td>
-                    <td><span class="badge text-bg-light border">{{ $row->category }}</span></td>
+                    <td>
+                        @if ($row->category)
+                            <span class="badge text-bg-light border">{{ $row->category->name }}</span>
+                        @else
+                            <span class="text-muted">Uncategorized</span>
+                        @endif
+                    </td>
                     <td>{{ $row->sku ?: '—' }}</td>
                     <td>{{ number_format($row->unit_price, 2) }}</td>
                     <td>
@@ -53,7 +60,7 @@ $editingId = old('product_id');
                             @php
                                 $productPayload = [
                                     'id' => $row->id,
-                                    'category' => $row->category,
+                                    'category_id' => $row->category_id,
                                     'name' => $row->name,
                                     'sku' => $row->sku,
                                     'unit_price' => $row->unit_price,
@@ -108,10 +115,20 @@ $editingId = old('product_id');
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="productCategory" class="form-label">Category</label>
-                        <input type="text" class="form-control @error('category') is-invalid @enderror"
-                            id="productCategory" name="category" value="{{ old('category') }}"
-                            placeholder="e.g. rice, drug, part, solar kit" required>
-                        @error('category')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <select class="form-select @error('category_id') is-invalid @enderror" id="productCategory" name="category_id" required>
+                            <option value="">&mdash; Select &mdash;</option>
+                            @foreach ($categories as $categoryOption)
+                                <option value="{{ $categoryOption->id }}" @selected(old('category_id') === $categoryOption->id)>
+                                    {{ $categoryOption->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        @if ($categories->isEmpty())
+                            <div class="form-text text-warning">
+                                No categories yet — <a href="{{ route('company.product-categories.index', ['company' => $company->slug]) }}">add one first</a>.
+                            </div>
+                        @endif
                     </div>
 
                     <div class="mb-3">
@@ -147,7 +164,8 @@ $editingId = old('product_id');
 @endsection
 
 @push('scripts')
- 
+
+
 <script>
     $(function() {
         var columnPrint = [0, 1, 2, 3, 4, 5];
@@ -195,7 +213,7 @@ $editingId = old('product_id');
             $form.attr('action', updateUrlTemplate.replace('__ID__', product.id));
             $('#productMethod').val('PUT');
             $('#productIdField').val(product.id);
-            $('#productCategory').val(product.category);
+            $('#productCategory').val(product.category_id);
             $('#productName').val(product.name);
             $('#productSku').val(product.sku);
             $('#productUnitPrice').val(product.unit_price);

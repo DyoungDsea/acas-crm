@@ -14,6 +14,9 @@ use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\StaffPageController;
 use App\Http\Controllers\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdminPageController;
+use App\Http\Controllers\ProductCategoryPageController;
+use App\Http\Controllers\PipelinePageController;
+use App\Http\Controllers\DealPageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -108,11 +111,30 @@ Route::middleware(['auth', 'active.user'])->group(function () {
             ->name('contacts.restore')
             ->withTrashed();
 
+        Route::get('/pipelines', [PipelinePageController::class, 'index'])->name('pipelines.index');
+        Route::post('/pipelines', [PipelinePageController::class, 'store'])->name('pipelines.store');
+        Route::put('/pipelines/{pipeline}', [PipelinePageController::class, 'update'])->name('pipelines.update');
+        Route::delete('/pipelines/{pipeline}', [PipelinePageController::class, 'destroy'])->name('pipelines.destroy');
+        Route::post('/pipelines/{pipeline}/stages', [PipelinePageController::class, 'storeStage'])->name('pipelines.stages.store');
+        Route::put('/pipelines/{pipeline}/stages/{stage}', [PipelinePageController::class, 'updateStage'])->name('pipelines.stages.update');
+        Route::delete('/pipelines/{pipeline}/stages/{stage}', [PipelinePageController::class, 'destroyStage'])->name('pipelines.stages.destroy');
+        Route::patch('/pipelines/{pipeline}/stages/{stage}/move', [PipelinePageController::class, 'moveStage'])->name('pipelines.stages.move');
+
+        Route::get('/deals', [DealPageController::class, 'index'])->name('deals.index');
+        Route::post('/deals', [DealPageController::class, 'store'])->name('deals.store');
+        Route::put('/deals/{deal}', [DealPageController::class, 'update'])->name('deals.update');
+
         Route::get('/products', [ProductPageController::class, 'index'])->name('products.index');
         Route::post('/products', [ProductPageController::class, 'store'])->name('products.store');
         Route::put('/products/{product}', [ProductPageController::class, 'update'])->name('products.update');
         Route::delete('/products/{product}', [ProductPageController::class, 'destroy'])->name('products.destroy');
         Route::patch('/products/{product}/activate', [ProductPageController::class, 'activate'])->name('products.activate');
+
+        Route::get('/product-categories', [ProductCategoryPageController::class, 'index'])->name('product-categories.index');
+        Route::post('/product-categories', [ProductCategoryPageController::class, 'store'])->name('product-categories.store');
+        Route::put('/product-categories/{product_category}', [ProductCategoryPageController::class, 'update'])->name('product-categories.update');
+        Route::delete('/product-categories/{product_category}', [ProductCategoryPageController::class, 'destroy'])->name('product-categories.destroy');
+
 
         Route::get('/pharmacy-batches', [PharmacyBatchPageController::class, 'index'])->name('pharmacy-batches.index');
         Route::post('/pharmacy-batches', [PharmacyBatchPageController::class, 'store'])->name('pharmacy-batches.store');
