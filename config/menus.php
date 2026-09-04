@@ -63,7 +63,7 @@ return [
                     'label' => 'Orders',
                     'route' => null,
                     'children' => [
-                        ['label' => 'All orders', 'route' => null],
+                        ['label' => 'All orders', 'route' => 'company.orders.index'],
                         ['label' => 'Payments', 'route' => null],
                         ['label' => 'Receipts', 'route' => null],
                     ],

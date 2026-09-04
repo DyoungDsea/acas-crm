@@ -17,6 +17,7 @@ use App\Http\Controllers\SuperAdminPageController;
 use App\Http\Controllers\ProductCategoryPageController;
 use App\Http\Controllers\PipelinePageController;
 use App\Http\Controllers\DealPageController;
+use App\Http\Controllers\OrderPageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -123,6 +124,11 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::get('/deals', [DealPageController::class, 'index'])->name('deals.index');
         Route::post('/deals', [DealPageController::class, 'store'])->name('deals.store');
         Route::put('/deals/{deal}', [DealPageController::class, 'update'])->name('deals.update');
+
+        Route::get('/orders', [OrderPageController::class, 'index'])->name('orders.index');
+        Route::post('/orders', [OrderPageController::class, 'store'])->name('orders.store');
+        Route::put('/orders/{order}', [OrderPageController::class, 'update'])->name('orders.update');
+
 
         Route::get('/products', [ProductPageController::class, 'index'])->name('products.index');
         Route::post('/products', [ProductPageController::class, 'store'])->name('products.store');
