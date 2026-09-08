@@ -18,6 +18,8 @@ use App\Http\Controllers\ProductCategoryPageController;
 use App\Http\Controllers\PipelinePageController;
 use App\Http\Controllers\DealPageController;
 use App\Http\Controllers\OrderPageController;
+use App\Http\Controllers\PaymentPageController;
+use App\Http\Controllers\ReceiptPageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -129,6 +131,9 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::post('/orders', [OrderPageController::class, 'store'])->name('orders.store');
         Route::put('/orders/{order}', [OrderPageController::class, 'update'])->name('orders.update');
 
+        Route::get('/payments', [PaymentPageController::class, 'index'])->name('payments.index');
+        Route::post('/payments', [PaymentPageController::class, 'store'])->name('payments.store');
+        Route::patch('/payments/{payment}/void', [PaymentPageController::class, 'void'])->name('payments.void');
 
         Route::get('/products', [ProductPageController::class, 'index'])->name('products.index');
         Route::post('/products', [ProductPageController::class, 'store'])->name('products.store');
@@ -145,6 +150,8 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::get('/pharmacy-batches', [PharmacyBatchPageController::class, 'index'])->name('pharmacy-batches.index');
         Route::post('/pharmacy-batches', [PharmacyBatchPageController::class, 'store'])->name('pharmacy-batches.store');
         Route::put('/pharmacy-batches/{pharmacy_batch}', [PharmacyBatchPageController::class, 'update'])->name('pharmacy-batches.update');
+
+        Route::get('/receipts', [ReceiptPageController::class, 'index'])->name('receipts.index');
 
         // Admin-only within this company — plain staff manage their
         // own work (contacts, deals, etc.) but not the team roster or

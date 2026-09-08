@@ -2,10 +2,7 @@
 
 @section('title', 'Orders')
 
-@push('styles')
-<link href="{{ asset('assets/DataTables/datatables.min.css') }}" rel="stylesheet">
-<link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
-@endpush
+
 
 @php
 $editingId = old('order_id');
@@ -57,9 +54,9 @@ $editingId = old('order_id');
                     <td class="fw-semibold">{{ $row->order_number }}</td>
                     <td>{{ $row->contact->name ?? '—' }}</td>
                     <td>{{ $row->items->count() }}</td>
-                    <td>{{ number_format($row->total_amount, 2) }}</td>
-                    <td>{{ number_format($row->amountPaid(), 2) }}</td>
-                    <td>{{ number_format($row->balanceDue(), 2) }}</td>
+                    <td>{{ formatNaira($row->total_amount, 2) }}</td>
+                    <td>{{ formatNaira($row->amountPaid(), 2) }}</td>
+                    <td>{{ formatNaira($row->balanceDue(), 2) }}</td>
                     <td>
                         @php
                             $statusClass = match ($row->status) {
