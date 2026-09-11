@@ -11,10 +11,21 @@ class Order extends Model
     use BelongsToCompany, HasUlids;
 
     protected $fillable = [
-        'company_id', 'contact_id', 'order_number', 'total_amount', 'status', 'created_by',
+        'company_id',
+        'contact_id',
+        'order_number',
+        'total_amount',
+        'status',
+        'created_by',
+        'rental_start_at',
+        'rental_end_at',
     ];
 
-    protected $casts = ['total_amount' => 'decimal:2'];
+    protected $casts = [
+        'total_amount' => 'decimal:2',
+        'rental_start_at' => 'date',
+        'rental_end_at' => 'date',
+    ];
 
     public function contact()
     {

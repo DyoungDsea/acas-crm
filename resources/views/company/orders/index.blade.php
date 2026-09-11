@@ -2,8 +2,6 @@
 
 @section('title', 'Orders')
 
-
-
 @php
 $editingId = old('order_id');
 @endphp
@@ -20,10 +18,10 @@ $editingId = old('order_id');
 </div>
 
 @if ($contacts->isEmpty())
-    <div class="alert alert-warning">
-        No customers yet — add a contact with type "Customer" under
-        <a href="{{ route('company.contacts.index', ['company' => $company->slug]) }}">Contacts</a> first.
-    </div>
+<div class="alert alert-warning">
+    No customers yet — add a contact with type "Customer" under
+    <a href="{{ route('company.contacts.index', ['company' => $company->slug]) }}">Contacts</a> first.
+</div>
 @endif
 
 <div class="card border-0 shadow-sm">
@@ -59,37 +57,37 @@ $editingId = old('order_id');
                     <td>{{ formatNaira($row->balanceDue(), 2) }}</td>
                     <td>
                         @php
-                            $statusClass = match ($row->status) {
-                                'paid' => 'text-bg-success-subtle text-success-emphasis',
-                                'partially_paid' => 'text-bg-warning-subtle text-warning-emphasis',
-                                'void' => 'text-bg-danger-subtle text-danger-emphasis',
-                                default => 'text-bg-light border',
-                            };
+                        $statusClass = match ($row->status) {
+                        'paid' => 'text-bg-success-subtle text-success-emphasis',
+                        'partially_paid' => 'text-bg-warning-subtle text-warning-emphasis',
+                        'void' => 'text-bg-danger-subtle text-danger-emphasis',
+                        default => 'text-bg-light border',
+                        };
                         @endphp
                         <span class="badge {{ $statusClass }}">{{ ucwords(str_replace('_', ' ', $row->status)) }}</span>
                     </td>
                     <td class="text-end no-export">
                         @if ($row->payments->isEmpty())
-                            @php
-                                $orderPayload = [
-                                    'id' => $row->id,
-                                    'order_number' => $row->order_number,
-                                    'contact_id' => $row->contact_id,
-                                    'items' => $row->items->map(fn ($item) => [
-                                        'product_id' => $item->product_id,
-                                        'description' => $item->description,
-                                        'quantity' => $item->quantity,
-                                        'unit_price' => $item->unit_price,
-                                    ])->values(),
-                                ];
-                            @endphp
-                            <button type="button"
-                                class="btn btn-sm btn-outline-secondary btn-edit-order"
-                                data-order='{{ json_encode($orderPayload) }}'>
-                                <i class="bi bi-pencil"></i> Edit
-                            </button>
+                        @php
+                        $orderPayload = [
+                        'id' => $row->id,
+                        'order_number' => $row->order_number,
+                        'contact_id' => $row->contact_id,
+                        'items' => $row->items->map(fn ($item) => [
+                        'product_id' => $item->product_id,
+                        'description' => $item->description,
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                        ])->values(),
+                        ];
+                        @endphp
+                        <button type="button"
+                            class="btn btn-sm btn-outline-secondary btn-edit-order"
+                            data-order='{{ json_encode($orderPayload) }}'>
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
                         @else
-                            <span class="text-muted small">Locked (has payments)</span>
+                        <span class="text-muted small">Locked (has payments)</span>
                         @endif
                     </td>
                 </tr>
@@ -119,9 +117,9 @@ $editingId = old('order_id');
                         <select class="form-select @error('contact_id') is-invalid @enderror" id="orderContact" name="contact_id" required>
                             <option value="">&mdash; Select &mdash;</option>
                             @foreach ($contacts as $contactOption)
-                                <option value="{{ $contactOption->id }}" @selected(old('contact_id') === $contactOption->id)>
-                                    {{ $contactOption->name }}
-                                </option>
+                            <option value="{{ $contactOption->id }}" @selected(old('contact_id')===$contactOption->id)>
+                                {{ $contactOption->name }}
+                            </option>
                             @endforeach
                         </select>
                         @error('contact_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -165,10 +163,16 @@ $editingId = old('order_id');
 @endsection
 
 @push('scripts')
+@php
+    $isPharmacy = $company->type === 'pharmacy';
 
-<script src="{{ asset('assets/DataTables/datatables.min.js') }}"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    $productsData = $products->map(fn ($p) => [
+        'id' => $p->id,
+        'name' => $p->name,
+        'unit_price' => $p->unit_price,
+        'available_qty' => $isPharmacy ? $p->available_qty : null,
+    ]);
+@endphp
 
 <script>
     $(function() {
@@ -179,8 +183,13 @@ $editingId = old('order_id');
             paging: false,
             info: false,
             responsive: true,
-            columnDefs: [{ targets: [0], orderable: false }],
-            language: { emptyTable: "No orders yet" },
+            columnDefs: [{
+                targets: [0],
+                orderable: false
+            }],
+            language: {
+                emptyTable: "No orders yet"
+            },
             dom: "<'row mb-3'" +
                 "<'col-lg-8 col-md-12 d-flex align-items-center gap-2 text-lg-start text-center mb-2 mb-lg-0'l f>" +
                 "<'col-lg-4 col-md-12 text-lg-end text-center mb-2 mb-lg-0'B>" +
@@ -190,16 +199,46 @@ $editingId = old('order_id');
                 "<'col-md-6 col-12 text-md-start text-center'i>" +
                 "<'col-md-6 col-12 d-flex justify-content-md-end justify-content-center'p>" +
                 ">",
-            buttons: [
-                { extend: 'print', className: 'btn-info', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'csv', className: 'btn-primary', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'excel', className: 'btn-success', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'pdf', className: 'btn-warning', title: printTitle, exportOptions: { columns: columnPrint } },
+            buttons: [{
+                    extend: 'print',
+                    className: 'btn-info',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn-primary',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn-success',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn-warning',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
             ]
         });
 
-        var products = @json($products->map(fn ($p) => ['id' => $p->id, 'name' => $p->name, 'unit_price' => $p->unit_price]));
 
+
+
+        var products = {!! json_encode($productsData) !!};
+        var isPharmacy = {!! json_encode($isPharmacy) !!};
         var $modalEl = $('#orderModal');
         var modal = new bootstrap.Modal($modalEl[0]);
         var $form = $('#orderForm');
@@ -211,7 +250,9 @@ $editingId = old('order_id');
             var html = '<option value="">Custom / no product</option>';
             products.forEach(function(p) {
                 var sel = (selectedId && String(selectedId) === String(p.id)) ? ' selected' : '';
-                html += '<option value="' + p.id + '" data-price="' + p.unit_price + '" data-name="' + p.name.replace(/"/g, '&quot;') + '"' + sel + '>' + p.name + '</option>';
+                var stockLabel = isPharmacy ? ' (stock: ' + p.available_qty + ')' : '';
+                html += '<option value="' + p.id + '" data-price="' + p.unit_price + '" data-name="' + p.name.replace(/"/g, '&quot;') + '"' +
+                    (isPharmacy ? ' data-stock="' + p.available_qty + '"' : '') + sel + '>' + p.name + stockLabel + '</option>';
             });
             return html;
         }
@@ -221,12 +262,14 @@ $editingId = old('order_id');
             var idx = itemIndex++;
             var $row = $(
                 '<tr data-idx="' + idx + '">' +
-                    '<td><select class="form-select form-select-sm item-product" name="items[' + idx + '][product_id]">' + productOptions(item.product_id) + '</select></td>' +
-                    '<td><input type="text" class="form-control form-control-sm item-description" name="items[' + idx + '][description]" required></td>' +
-                    '<td><input type="number" min="1" step="1" class="form-control form-control-sm item-quantity" name="items[' + idx + '][quantity]" value="1" required></td>' +
-                    '<td><input type="number" min="0" step="0.01" class="form-control form-control-sm item-unit-price" name="items[' + idx + '][unit_price]" value="0.00" required></td>' +
-                    '<td class="item-subtotal">0.00</td>' +
-                    '<td><button type="button" class="btn btn-sm btn-outline-danger remove-item-btn"><i class="bi bi-trash"></i></button></td>' +
+                '<td><select class="form-select form-select-sm item-product" name="items[' + idx + '][product_id]">' + productOptions(item.product_id) + '</select></td>' +
+                '<td><input type="text" class="form-control form-control-sm item-description" name="items[' + idx + '][description]" required></td>' +
+                '<td><input type="number" min="1" step="1" class="form-control form-control-sm item-quantity" name="items[' + idx + '][quantity]" value="1" required>' +
+                (isPharmacy ? '<div class="item-stock-warning text-danger small mt-1 d-none">Exceeds stock</div>' : '') +
+                '</td>' +
+                '<td><input type="number" min="0" step="0.01" class="form-control form-control-sm item-unit-price" name="items[' + idx + '][unit_price]" value="0.00" required></td>' +
+                '<td class="item-subtotal">0.00</td>' +
+                '<td><button type="button" class="btn btn-sm btn-outline-danger remove-item-btn"><i class="bi bi-trash"></i></button></td>' +
                 '</tr>'
             );
 
@@ -242,6 +285,17 @@ $editingId = old('order_id');
             var qty = parseFloat($row.find('.item-quantity').val()) || 0;
             var price = parseFloat($row.find('.item-unit-price').val()) || 0;
             $row.find('.item-subtotal').text((qty * price).toFixed(2));
+
+            if (isPharmacy) {
+                var stock = $row.find('.item-product option:selected').data('stock');
+                var $warning = $row.find('.item-stock-warning');
+                if (stock !== undefined && stock !== '' && qty > parseFloat(stock)) {
+                    $warning.text('Exceeds stock (' + stock + ' available)').removeClass('d-none');
+                } else {
+                    $warning.addClass('d-none');
+                }
+            }
+
             recalcGrandTotal();
         }
 
@@ -282,7 +336,9 @@ $editingId = old('order_id');
         }
 
         $('#addOrderBtn').on('click', openCreateModal);
-        $('#addOrderItemBtn').on('click', function() { addItemRow(); });
+        $('#addOrderItemBtn').on('click', function() {
+            addItemRow();
+        });
 
         $('#ordersTable tbody').on('click', '.btn-edit-order', function() {
             openEditModal($(this).data('order'));
@@ -308,17 +364,27 @@ $editingId = old('order_id');
                 }
             });
 
-        @if ($errors->any())
-            resetItems();
-            @if (old('items'))
-                @foreach (old('items') as $oldItem)
-                    addItemRow(@json($oldItem));
-                @endforeach
-            @else
-                addItemRow();
-            @endif
-            modal.show();
-        @endif
+
+     @php
+        $oldItems = old('items', []);
+    @endphp
+
+    const hasErrors = @json($errors->any());
+    const oldItems = @json($oldItems);
+
+    if (hasErrors) {
+        resetItems();
+
+        if (oldItems.length > 0) {
+            oldItems.forEach(function (item) {
+                addItemRow(item);
+            });
+        } else {
+            addItemRow();
+        }
+
+        modal.show();
+    }
     });
 </script>
 @endpush

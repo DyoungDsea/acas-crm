@@ -45,8 +45,8 @@ return [
                 ['label' => 'Super admins', 'route' => 'super-admin.super-admins.index'],
                 ['label' => 'Company admins', 'route' => 'super-admin.company-admins.index'],
             ],
-        ],
-        ['label' => 'Reports', 'icon' => 'bi-graph-up', 'route' => null],
+        ], 
+        ['label' => 'Reports', 'icon' => 'bi-graph-up', 'route' => 'super-admin.reports.index'],
     ],
 
     'company' => [
@@ -63,9 +63,10 @@ return [
                     'label' => 'Orders',
                     'route' => null,
                     'children' => [
-                        ['label' => 'All orders', 'route' => 'company.orders.index'],
-                        ['label' => 'Payments', 'route' => 'company.payments.index'],
-                        ['label' => 'Receipts', 'route' => 'company.receipts.index'],
+                        ['label' => 'All orders', 'route' => 'company.orders.index', 'excludeTypes' => ['automotive']],
+                        // ['label' => 'All orders', 'route' => 'company.orders.index'],
+                        ['label' => 'Payments', 'route' => 'company.payments.index', 'excludeTypes' => ['automotive']],
+                        ['label' => 'Receipts', 'route' => 'company.receipts.index', 'excludeTypes' => ['automotive']],
                     ],
                 ],
             ],
@@ -74,6 +75,7 @@ return [
             'label' => 'Products',
             'icon' => 'bi-box-seam',
             'route' => null,
+            'excludeTypes' => ['automotive'],
             'children' => [
                 ['label' => 'All products', 'route' => 'company.products.index'],
                 ['label' => 'Categories', 'route' => 'company.product-categories.index'],
@@ -84,12 +86,20 @@ return [
             'icon' => 'bi-diagram-3',
             'route' => null,
             'children' => [
-                ['label' => 'Properties & leases', 'route' => null, 'types' => ['properties']],
-                ['label' => 'Vehicles & bookings', 'route' => null, 'types' => ['automotive']],
+                ['label' => 'Properties', 'route' => 'company.properties.index', 'types' => ['properties']],
+                ['label' => 'Leases', 'route' => 'company.leases.index', 'types' => ['properties']],
+                // ['label' => 'Vehicles & bookings', 'route' => 'company.vehicles.index', 'types' => ['automotive']],
+                ['label' => 'Vehicle listings', 'route' => 'company.vehicle-listings.index', 'types' => ['automotive']],
+                ['label' => 'Sales & rentals', 'route' => 'company.vehicle-transactions.index', 'types' => ['automotive']],
+
+                ['label' => 'Payments', 'route' => 'company.payments.index', 'types' => ['automotive']],
+                ['label' => 'Receipts', 'route' => 'company.receipts.index', 'types' => ['automotive']],
+
                 ['label' => 'Pharmacy stock', 'route' => 'company.pharmacy-batches.index', 'types' => ['pharmacy']],
-                ['label' => 'Crop & livestock', 'route' => null, 'types' => ['farms']],
-                ['label' => 'Solar projects', 'route' => null, 'types' => ['energy']],
-                ['label' => 'Engagements', 'route' => null, 'types' => ['agric_services', 'farms']],
+                ['label' => 'Crop cycles', 'route' => 'company.crop-cycles.index', 'types' => ['farms', 'agric_services']],
+                ['label' => 'Livestock', 'route' => 'company.livestock-batches.index', 'types' => ['farms', 'agric_services']],
+                ['label' => 'Solar projects', 'route' => 'company.solar-projects.index', 'types' => ['energy']],
+                ['label' => 'Engagements', 'route' => 'company.engagements.index', 'types' => ['agric_services', 'farms']],
             ],
         ],
         [

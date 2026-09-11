@@ -14,12 +14,21 @@ use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\StaffPageController;
 use App\Http\Controllers\SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdminPageController;
+use App\Http\Controllers\SuperAdminReportPageController;
 use App\Http\Controllers\ProductCategoryPageController;
 use App\Http\Controllers\PipelinePageController;
 use App\Http\Controllers\DealPageController;
 use App\Http\Controllers\OrderPageController;
 use App\Http\Controllers\PaymentPageController;
 use App\Http\Controllers\ReceiptPageController;
+use App\Http\Controllers\CropCyclePageController;
+use App\Http\Controllers\LivestockBatchPageController;
+use App\Http\Controllers\EngagementPageController;
+use App\Http\Controllers\SolarProjectPageController;
+use App\Http\Controllers\LeasePageController;
+use App\Http\Controllers\PropertyPageController;
+use App\Http\Controllers\VehicleListingPageController;
+use App\Http\Controllers\VehicleTransactionPageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -97,6 +106,7 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::put('/super-admins/{admin}', [SuperAdminPageController::class, 'update'])->name('super-admins.update');
         Route::delete('/super-admins/{admin}', [SuperAdminPageController::class, 'destroy'])->name('super-admins.destroy');
         Route::patch('/super-admins/{admin}/activate', [SuperAdminPageController::class, 'activate'])->name('super-admins.activate');
+        Route::get('/reports', [SuperAdminReportPageController::class, 'index'])->name('reports.index');
     });
 
     // Company dashboard — /{company-slug}/..., themed per company via
@@ -152,6 +162,46 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::put('/pharmacy-batches/{pharmacy_batch}', [PharmacyBatchPageController::class, 'update'])->name('pharmacy-batches.update');
 
         Route::get('/receipts', [ReceiptPageController::class, 'index'])->name('receipts.index');
+
+
+        Route::get('/crop-cycles', [CropCyclePageController::class, 'index'])->name('crop-cycles.index');
+        Route::post('/crop-cycles', [CropCyclePageController::class, 'store'])->name('crop-cycles.store');
+        Route::put('/crop-cycles/{crop_cycle}', [CropCyclePageController::class, 'update'])->name('crop-cycles.update');
+
+        Route::get('/livestock-batches', [LivestockBatchPageController::class, 'index'])->name('livestock-batches.index');
+        Route::post('/livestock-batches', [LivestockBatchPageController::class, 'store'])->name('livestock-batches.store');
+        Route::put('/livestock-batches/{livestock_batch}', [LivestockBatchPageController::class, 'update'])->name('livestock-batches.update');
+
+
+        Route::get('/engagements', [EngagementPageController::class, 'index'])->name('engagements.index');
+        Route::post('/engagements', [EngagementPageController::class, 'store'])->name('engagements.store');
+        Route::put('/engagements/{engagement}', [EngagementPageController::class, 'update'])->name('engagements.update');
+
+
+        Route::get('/solar-projects', [SolarProjectPageController::class, 'index'])->name('solar-projects.index');
+        Route::post('/solar-projects', [SolarProjectPageController::class, 'store'])->name('solar-projects.store');
+        Route::put('/solar-projects/{solar_project}', [SolarProjectPageController::class, 'update'])->name('solar-projects.update');
+        Route::post('/solar-projects/{solar_project}/surveys', [SolarProjectPageController::class, 'storeSurvey'])->name('solar-projects.surveys.store');
+        Route::put('/solar-projects/{solar_project}/surveys/{survey}', [SolarProjectPageController::class, 'updateSurvey'])->name('solar-projects.surveys.update');
+
+        Route::get('/properties', [PropertyPageController::class, 'index'])->name('properties.index');
+        Route::post('/properties', [PropertyPageController::class, 'store'])->name('properties.store');
+        Route::put('/properties/{property}', [PropertyPageController::class, 'update'])->name('properties.update');
+        Route::post('/properties/{property}/units', [PropertyPageController::class, 'storeUnit'])->name('properties.units.store');
+        Route::put('/properties/{property}/units/{unit}', [PropertyPageController::class, 'updateUnit'])->name('properties.units.update');
+
+        Route::get('/leases', [LeasePageController::class, 'index'])->name('leases.index');
+        Route::post('/leases', [LeasePageController::class, 'store'])->name('leases.store');
+        Route::put('/leases/{lease}', [LeasePageController::class, 'update'])->name('leases.update');
+
+        Route::get('/vehicle-listings', [VehicleListingPageController::class, 'index'])->name('vehicle-listings.index');
+        Route::post('/vehicle-listings', [VehicleListingPageController::class, 'store'])->name('vehicle-listings.store');
+        Route::put('/vehicle-listings/{vehicle_listing}', [VehicleListingPageController::class, 'update'])->name('vehicle-listings.update');
+
+        Route::get('/vehicle-transactions', [VehicleTransactionPageController::class, 'index'])->name('vehicle-transactions.index');
+        Route::post('/vehicle-transactions', [VehicleTransactionPageController::class, 'store'])->name('vehicle-transactions.store');
+        Route::put('/vehicle-transactions/{order}', [VehicleTransactionPageController::class, 'update'])->name('vehicle-transactions.update');
+        Route::patch('/vehicle-transactions/{order}/return', [VehicleTransactionPageController::class, 'markReturned'])->name('vehicle-transactions.return');
 
         // Admin-only within this company — plain staff manage their
         // own work (contacts, deals, etc.) but not the team roster or

@@ -98,14 +98,10 @@
                 * Remove menu items that don't belong
                 * to this company type.
                 */
-                if (
-                !empty($item['types']) &&
-                !in_array(
-                $companyType,
-                $item['types'],
-                true
-                )
-                ) {
+                if (!empty($item['types']) && !in_array( $companyType, $item['types'], true)) {
+                continue;
+                }
+                if (!empty($item['excludeTypes']) && in_array($companyType, $item['excludeTypes'], true)) {
                 continue;
                 }
 

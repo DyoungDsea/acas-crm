@@ -41,4 +41,12 @@ class PharmacyBatch extends Model
     {
         return $this->expiry_date->isPast();
     }
+
+    // Order items that have drawn stock from this batch. Only
+    // relevant while quantity_remaining is being tracked against
+    // sales — see OrderPageController.
+    public function orderItemAllocations()
+    {
+        return $this->hasMany(OrderItemBatch::class);
+    }
 }
