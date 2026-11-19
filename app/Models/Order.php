@@ -63,6 +63,10 @@ class Order extends Model
      */
     public function refreshStatus(): void
     {
+        if ($this->status === 'void') {
+            return;
+        }
+
         $paid = $this->amountPaid();
 
         $this->status = match (true) {

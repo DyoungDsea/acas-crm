@@ -113,16 +113,44 @@ $editingId = old('order_id');
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="orderContact" class="form-label">Contact</label>
-                        <select class="form-select @error('contact_id') is-invalid @enderror" id="orderContact" name="contact_id" required>
-                            <option value="">&mdash; Select &mdash;</option>
-                            @foreach ($contacts as $contactOption)
-                            <option value="{{ $contactOption->id }}" @selected(old('contact_id')===$contactOption->id)>
-                                {{ $contactOption->name }}
-                            </option>
-                            @endforeach
-                        </select>
-                        @error('contact_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="orderContact" class="form-label mb-1">Contact</label>
+                            <a href="javascript:void(0)" id="toggleNewContact" class="small">+ Add new contact</a>
+                        </div>
+
+                        <div id="existingContactWrap">
+                            <select class="form-select @error('contact_id') is-invalid @enderror" id="orderContact" name="contact_id" required>
+                                <option value="">&mdash; Select &mdash;</option>
+                                @foreach ($contacts as $contactOption)
+                                    <option value="{{ $contactOption->id }}" @selected(old('contact_id') === $contactOption->id)>
+                                        {{ $contactOption->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('contact_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div id="newContactWrap" class="d-none">
+                            <input type="text" class="form-control mb-2 @error('new_contact_name') is-invalid @enderror"
+                                id="newContactName" name="new_contact_name" maxlength="255"
+                                placeholder="Full name" value="{{ old('new_contact_name') }}" disabled>
+                            @error('new_contact_name')<div class="invalid-feedback d-block mb-2">{{ $message }}</div>@enderror
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control @error('new_contact_phone') is-invalid @enderror"
+                                        id="newContactPhone" name="new_contact_phone" maxlength="50"
+                                        placeholder="Phone (optional)" value="{{ old('new_contact_phone') }}" disabled>
+                                    @error('new_contact_phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="email" class="form-control @error('new_contact_email') is-invalid @enderror"
+                                        id="newContactEmail" name="new_contact_email" maxlength="255"
+                                        placeholder="Email (optional)" value="{{ old('new_contact_email') }}" disabled>
+                                    @error('new_contact_email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                            </div>
+                            <div class="form-text">Saved as a customer under Contacts.</div>
+                        </div>
                     </div>
 
                     <label class="form-label">Line items</label>
@@ -246,6 +274,36 @@ $editingId = old('order_id');
         var updateUrlTemplate = "{{ route('company.orders.update', ['company' => $company->slug, 'order' => '__ID__']) }}";
         var itemIndex = 0;
 
+        //! New-contact toggle (same approach as the Products page category toggle)
+        var $existingContactWrap = $('#existingContactWrap');
+        var $newContactWrap = $('#newContactWrap');
+        var $contactSelect = $('#orderContact');
+        var $newContactFields = $('#newContactName, #newContactPhone, #newContactEmail');
+        var $toggleNewContact = $('#toggleNewContact');
+        var hasNoContacts = {{ $contacts->isEmpty() ? 'true' : 'false' }};
+
+        function setNewContactMode(on) {
+            $newContactWrap.toggleClass('d-none', !on);
+            $existingContactWrap.toggleClass('d-none', on);
+
+            // Disabled inputs aren't submitted, so only one side reaches the server.
+            $newContactFields.prop('disabled', !on);
+            $('#newContactName').prop('required', on);
+            $contactSelect.prop('disabled', on).prop('required', !on);
+
+            if (on) {
+                $contactSelect.val('');
+                $('#newContactName').trigger('focus');
+            } else {
+                $newContactFields.val('');
+            }
+            $toggleNewContact.text(on ? '← Choose existing contact' : '+ Add new contact');
+        }
+
+        $toggleNewContact.on('click', function(e) {
+            e.preventDefault();
+            setNewContactMode($newContactWrap.hasClass('d-none'));
+        });
         function productOptions(selectedId) {
             var html = '<option value="">Custom / no product</option>';
             products.forEach(function(p) {
@@ -315,6 +373,7 @@ $editingId = old('order_id');
 
         function openCreateModal() {
             $form[0].reset();
+            setNewContactMode(hasNoContacts);
             $form.attr('action', storeUrl);
             $('#orderMethod').val('');
             $('#orderIdField').val('');
@@ -325,6 +384,7 @@ $editingId = old('order_id');
         }
 
         function openEditModal(order) {
+            setNewContactMode(false);
             $form.attr('action', updateUrlTemplate.replace('__ID__', order.id));
             $('#orderMethod').val('PUT');
             $('#orderIdField').val(order.id);
@@ -372,6 +432,10 @@ $editingId = old('order_id');
     const hasErrors = @json($errors->any());
     const oldItems = @json($oldItems);
 
+    @if (old('new_contact_name'))
+        setNewContactMode(true);
+    @endif
+    
     if (hasErrors) {
         resetItems();
 

@@ -74,7 +74,7 @@
             </div>
         </div>
     </div>
-       
+
 </div>
 
 <div class="row g-3 mb-4">
@@ -83,7 +83,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-semibold mb-0">Recent orders</h6>
-                    <a href="{{ route('company.orders.index', ['company' => $company->slug]) }}" class="small">View all</a>
+                  
                 </div>
                 @if ($recentOrders->isEmpty())
                 <p class="text-muted small mb-0">No orders yet.</p>

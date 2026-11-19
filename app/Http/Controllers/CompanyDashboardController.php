@@ -27,8 +27,8 @@ class CompanyDashboardController extends Controller
             'contactsCount' => Contact::where('company_id', $company->id)->count(),
             'openDealsCount' => (clone $openDeals)->count(),
             'openDealsValue' => (clone $openDeals)->sum('amount'),
-            'ordersCount' => Order::where('company_id', $company->id)->count(),
-            'totalRevenue' => Order::where('company_id', $company->id)->sum('total_amount'),
+            'ordersCount' => Order::where('company_id', $company->id)->where('status', '!=', 'void')->count(),
+            'totalRevenue' => Order::where('company_id', $company->id)->where('status', '!=', 'void')->sum('total_amount'),
             'outstandingBalance' => $this->outstandingBalance($company),
             'paymentsThisMonth' => Payment::whereHas('order', fn($q) => $q->where('company_id', $company->id))
                 ->whereMonth('received_at', now()->month)

@@ -18,6 +18,9 @@ class Company extends Model
         'phone',
         'email',
         'is_active',
+        'receipt_header_path',
+        'receipt_footer_path',
+        'receipt_note'
     ];
 
     protected $casts = [
@@ -33,6 +36,17 @@ class Company extends Model
         'automotive',
         'agric_services',
     ];
+    /**
+     * Company types that track sellable stock quantities (StockLot). Orders
+     * for these draw stock down and refuse to go through when there isn't
+     * enough.
+     */
+    public const STOCK_TRACKED_TYPES = ['hair_vendor'];
+
+    public function tracksStock(): bool
+    {
+        return $this->type === 'pharmacy' || in_array($this->type, self::STOCK_TRACKED_TYPES, true);
+    }
 
     public function paymentSetting()
     {

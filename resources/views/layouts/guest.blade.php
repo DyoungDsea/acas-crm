@@ -34,7 +34,7 @@
                         <span class="auth-mark__word">ACAS GROUP <br>Nigeria</span>
                     </div>
                 </div>
-                <p class="auth-panel__tagline">@yield('panel-tagline', 'Seven businesses. One record of everything.')</p>
+                <p class="auth-panel__tagline">@yield('panel-tagline', 'Building sustainable growth across industries.')</p>
             </div>
         </aside>
 

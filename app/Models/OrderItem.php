@@ -37,4 +37,12 @@ class OrderItem extends Model
     {
         return $this->hasMany(OrderItemBatch::class);
     }
+
+    // Same idea for every other stock-tracked company type
+    // (Company::STOCK_TRACKED_TYPES) — which StockLot(s) this item
+    // drew from.
+    public function stockLotAllocations()
+    {
+        return $this->hasMany(OrderItemStockLot::class);
+    }
 }

@@ -7,9 +7,9 @@ use App\Models\Company;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Receipt;
-use Illuminate\Support\Facades\DB;
+use App\Support\DocumentNumber;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 // Payments are immutable once logged — no update()/destroy() here.
@@ -63,6 +63,11 @@ class PaymentPageController extends Controller
     public function store(StoreOrderPaymentRequest $request, Company $company)
     {
         $order = Order::where('company_id', $company->id)->findOrFail($request->validated('order_id'));
+
+        if ($order->status === 'void') {
+            throw ValidationException::withMessages(['order_id' => 'This order was cancelled — it cannot take payments.']);
+        }
+
         $settings = $company->paymentSetting;
         $amount = $request->validated('amount');
         $balance = $order->balanceDue();
@@ -122,22 +127,8 @@ class PaymentPageController extends Controller
             ->with('status', "Payment voided — receipt {$receipt->receipt_number} marked void.");
     }
 
-    // Scoped per-company, same fix already applied to Order numbers
-    // in OrderPageController — Api\PaymentController's version of this
-    // counts receipts across ALL companies, letting two companies
-    // share one drifting global sequence.
     private function generateReceiptNumber(Order $order): string
     {
-        $prefix = strtoupper(Str::substr(Str::slug($order->company->name), 0, 3));
-        $year = now()->year;
-        $sequence = str_pad(
-            (string) (Receipt::whereHas('payment.order', fn($q) => $q->where('company_id', $order->company_id))
-                ->whereYear('created_at', $year)->count() + 1),
-            6,
-            '0',
-            STR_PAD_LEFT
-        );
-
-        return "{$prefix}-{$year}-{$sequence}";
+        return DocumentNumber::receipt($order->company->name);
     }
 }

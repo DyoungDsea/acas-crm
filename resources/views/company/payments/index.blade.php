@@ -95,7 +95,7 @@
                             @foreach ($openOrders as $orderOption)
                             <option value="{{ $orderOption['id'] }}" data-balance="{{ $orderOption['balance_due'] }}"
                                 @selected(old('order_id')===$orderOption['id'])>
-                                {{ $orderOption['order_number'] }} — {{ $orderOption['contact_name'] }} (balance: {{ number_format($orderOption['balance_due'], 2) }})
+                                {{ $orderOption['order_number'] }} — {{ $orderOption['contact_name'] }} (balance: {{ formatNaira($orderOption['balance_due'], 2) }})
                             </option>
                             @endforeach
                         </select>

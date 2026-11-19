@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('title', 'Sign in')
-@section('panel-tagline', 'Rice to renewables — every company, one login.')
+@section('panel-tagline', 'Building sustainable growth across industries...')
 
 @section('content')
 <p class="auth-eyebrow">Welcome back</p>
@@ -63,7 +63,6 @@
                 <ul class="auth-help-list">
                     <li><strong>Forgot your password?</strong> Use the link on the sign-in form to reset it by email.</li>
                     <li><strong>Account not working?</strong> Ask your company admin to check it's active.</li>
-                    <li><strong>Super admin account?</strong> Email password resets are turned off for this role — contact whoever manages the server.</li>
                 </ul>
             </div>
         </div>

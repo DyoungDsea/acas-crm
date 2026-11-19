@@ -29,6 +29,10 @@ use App\Http\Controllers\LeasePageController;
 use App\Http\Controllers\PropertyPageController;
 use App\Http\Controllers\VehicleListingPageController;
 use App\Http\Controllers\VehicleTransactionPageController;
+use App\Http\Controllers\StockLotPageController;
+
+use App\Http\Controllers\HotelRoomPageController;
+use App\Http\Controllers\ReservationPageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -156,6 +160,9 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::put('/product-categories/{product_category}', [ProductCategoryPageController::class, 'update'])->name('product-categories.update');
         Route::delete('/product-categories/{product_category}', [ProductCategoryPageController::class, 'destroy'])->name('product-categories.destroy');
 
+        Route::get('/stock', [StockLotPageController::class, 'index'])->name('stock-lots.index');
+        Route::post('/stock', [StockLotPageController::class, 'store'])->name('stock-lots.store');
+        Route::put('/stock/{stock_lot}', [StockLotPageController::class, 'update'])->name('stock-lots.update');
 
         Route::get('/pharmacy-batches', [PharmacyBatchPageController::class, 'index'])->name('pharmacy-batches.index');
         Route::post('/pharmacy-batches', [PharmacyBatchPageController::class, 'store'])->name('pharmacy-batches.store');
@@ -203,6 +210,14 @@ Route::middleware(['auth', 'active.user'])->group(function () {
         Route::put('/vehicle-transactions/{order}', [VehicleTransactionPageController::class, 'update'])->name('vehicle-transactions.update');
         Route::patch('/vehicle-transactions/{order}/return', [VehicleTransactionPageController::class, 'markReturned'])->name('vehicle-transactions.return');
 
+        Route::get('/hotel-rooms', [HotelRoomPageController::class, 'index'])->name('hotel-rooms.index');
+        Route::post('/hotel-rooms', [HotelRoomPageController::class, 'store'])->name('hotel-rooms.store');
+        Route::put('/hotel-rooms/{hotel_room}', [HotelRoomPageController::class, 'update'])->name('hotel-rooms.update');
+
+        Route::get('/reservations', [ReservationPageController::class, 'index'])->name('reservations.index');
+        Route::post('/reservations', [ReservationPageController::class, 'store'])->name('reservations.store');
+        Route::put('/reservations/{order}', [ReservationPageController::class, 'update'])->name('reservations.update');
+        Route::patch('/reservations/{order}/cancel', [ReservationPageController::class, 'cancel'])->name('reservations.cancel');
         // Admin-only within this company — plain staff manage their
         // own work (contacts, deals, etc.) but not the team roster or
         // company-wide settings like payment rules.

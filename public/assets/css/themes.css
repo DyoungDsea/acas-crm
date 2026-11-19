@@ -19,42 +19,55 @@
    Closest in spirit to the group's root green, shifted olive and
    a touch lighter so it still reads as distinct from super admin. */
 body.theme-farms {
-  --brand-green: #35502a;
-  --brand-green-dark: #26391e;
+    --brand-green: #0f889e;
+    --brand-green-dark: #094d58;
 }
 
 /* ACAS Homes & Properties — brick/clay brown, real-estate coded. */
 body.theme-properties {
-  --brand-green: #5c3a2e;
-  --brand-green-dark: #422a21;
+    --brand-green: #5c3a2e;
+    --brand-green-dark: #422a21;
 }
 
 /* ACAS Pharmacy — deep teal, clinical and trustworthy. */
 body.theme-pharmacy {
-  --brand-green: #1f4a4a !important;
-  --brand-green-dark: #163636 !important;
+    --brand-green: #9c1abd !important;
+    --brand-green-dark: #530965 !important;
 }
 
 /* Kezong Trading — deep navy, commerce and finance coded. */
 body.theme-trading {
-  --brand-green: #22314a;
-  --brand-green-dark: #182335;
+    --brand-green: #052d71;
+    --brand-green-dark: #081b3c;
 }
 
 /* Helion Dynamics — bronze/amber, sun and solar without going neon. */
 body.theme-energy {
-  --brand-green: #5a3a14;
-  --brand-green-dark: #42290e;
+    --brand-green: #5a3a14;
+    --brand-green-dark: #42290e;
 }
 
 /* T & T Prime Venture — deep wine/maroon, automotive energy. */
 body.theme-automotive {
-  --brand-green: #5a2430;
-  --brand-green-dark: #421a23;
+    --brand-green: #0911a9;
+    --brand-green-dark: #060a4b;
 }
 
 /* UDFDB Agric Services — ochre/mustard, grain and investment coded. */
 body.theme-agric_services {
-  --brand-green: #5a4a1f;
-  --brand-green-dark: #423717;
+    --brand-green: #c9970c;
+    --brand-green-dark: #886608;
+}
+
+/* UDFDB Agric Services — ochre/mustard, grain and investment coded. */
+body.theme-hair_vendor {
+    --brand-green: #0cadc9;
+    --brand-green-dark: #075563;
+}
+
+
+/* ACAS Hotel — deep teal, calm hospitality. */
+body.theme-hotel {
+    --brand-green: #14414f;
+    --brand-green-dark: #0e2f3a;
 }

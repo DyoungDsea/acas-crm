@@ -26,6 +26,14 @@
         .modal-footer {
             display: none !important;
         }
+
+        #receiptPrintArea img {
+            max-width: 100%;
+        }
+
+        @page {
+            margin: 8mm;
+        }
     }
 
     .receipt-voided-stamp {
@@ -63,6 +71,7 @@
                 <tr>
                     <th>S/N</th>
                     <th>Receipt #</th>
+                    <th>Order #</th>
                     <th>Contact</th>
                     <th>Amount</th>
                     <th>Issued by</th>
@@ -85,6 +94,9 @@
                 'address' => $company->address,
                 'phone' => $company->phone,
                 'email' => $company->email,
+                'header_url' => $company->receipt_header_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($company->receipt_header_path) : null,
+                'footer_url' => $company->receipt_footer_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($company->receipt_footer_path) : null,
+                'note' => $company->receipt_note,
                 ],
                 'contact' => [
                 'name' => $order->contact->name ?? '—',
@@ -111,6 +123,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="fw-semibold">{{ $row->receipt_number }}</td>
+                    <td>{{ $order->order_number ?? '—' }}</td>
                     <td>{{ $order->contact->name ?? '—' }}</td>
                     <td>{{ formatNaira($row->payment->amount ?? 0, 2) }}</td>
                     <td>{{ $row->issuedByUser->name ?? '—' }}</td>
@@ -123,7 +136,7 @@
                         @endif
                     </td>
                     <td class="text-end no-export">
-                        <button type="button" class="btn btn-sm btn-secondary btn-view-receipt"
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-view-receipt"
                             data-receipt='{{ json_encode($receiptPayload) }}'>
                             <i class="bi bi-printer"></i> View / print
                         </button>
@@ -147,13 +160,17 @@
                 <div id="receiptPrintArea" class="position-relative p-2">
                     <div id="receiptVoidStamp" class="receipt-voided-stamp d-none">VOID</div>
 
+                    {{-- Company letterhead banner (Settings > Receipt letterhead).
+                         When present it replaces the plain-text company block. --}}
+                    <img id="receiptHeaderImg" class="d-none w-100 mb-3" alt="">
+
                     <div class="d-flex justify-content-between align-items-start mb-4">
-                        <div>
+                        <div id="receiptCompanyBlock">
                             <h4 class="mb-1" id="receiptCompanyName"></h4>
                             <div class="text-muted small" id="receiptCompanyAddress"></div>
                             <div class="text-muted small" id="receiptCompanyContact"></div>
                         </div>
-                        <div class="text-end">
+                        <div class="text-end ms-auto">
                             <h5 class="mb-1">RECEIPT</h5>
                             <div class="small"><strong>No:</strong> <span id="receiptNumber"></span></div>
                             <div class="small"><strong>Order:</strong> <span id="receiptOrderNumber"></span></div>
@@ -215,6 +232,9 @@
                     <div class="text-muted small mt-4">
                         Issued by <span id="receiptIssuedBy"></span>. Thank you for your business.
                     </div>
+                    <div class="small mt-2 d-none" id="receiptNote" style="white-space: pre-line;"></div>
+
+                    <img id="receiptFooterImg" class="d-none w-100 mt-4" alt="">
                 </div>
             </div>
             <div class="modal-footer">
@@ -289,7 +309,7 @@
             ]
         });
 
-       function money(n) {
+        function money(n) {
             return '₦' + parseFloat(n || 0).toLocaleString('en-NG', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
@@ -330,6 +350,13 @@
             $('#receiptIssuedBy').text(receipt.issued_by);
 
             $('#receiptVoidStamp').toggleClass('d-none', !receipt.is_voided);
+
+            // Letterhead: header image replaces the text company block.
+            var hasHeader = !!receipt.company.header_url;
+            $('#receiptHeaderImg').toggleClass('d-none', !hasHeader).attr('src', receipt.company.header_url || '');
+            $('#receiptCompanyBlock').toggleClass('d-none', hasHeader);
+            $('#receiptFooterImg').toggleClass('d-none', !receipt.company.footer_url).attr('src', receipt.company.footer_url || '');
+            $('#receiptNote').toggleClass('d-none', !receipt.company.note).text(receipt.company.note || '');
 
             new bootstrap.Modal(document.getElementById('receiptModal')).show();
         }

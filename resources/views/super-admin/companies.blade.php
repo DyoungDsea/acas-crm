@@ -2,7 +2,7 @@
 
 @section('title', 'Companies')
 
- 
+
 
 @php
 // If a create/edit just failed validation, old('company_id') tells
@@ -140,7 +140,7 @@ $editingId = old('company_id');
                         <label for="companyType" class="form-label">Type</label>
                         <select class="form-select @error('type') is-invalid @enderror" id="companyType" name="type">
                             <option value="">&mdash; Select &mdash;</option>
-                            @foreach (['farms' => 'Farms', 'properties' => 'Properties', 'pharmacy' => 'Pharmacy', 'trading' => 'Trading', 'energy' => 'Energy', 'automotive' => 'Automotive', 'agric_services' => 'Agric Services'] as $value => $label)
+                            @foreach (['farms' => 'Farms', 'properties' => 'Properties', 'pharmacy' => 'Pharmacy', 'trading' => 'Trading', 'energy' => 'Energy', 'automotive' => 'Automotive', 'agric_services' => 'Agric Services','hotel' => 'Hotel', 'hair_vendor'=>'Hair Vendor'] as $value => $label)
                             <option value="{{ $value }}" @selected(old('type')===$value)>{{ $label }}</option>
                             @endforeach
                         </select>

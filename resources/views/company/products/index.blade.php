@@ -2,7 +2,7 @@
 
 @section('title', 'Products')
 
- 
+
 
 @php
 $editingId = old('product_id');
@@ -41,30 +41,30 @@ $editingId = old('product_id');
                     <td class="fw-semibold">{{ $row->name }}</td>
                     <td>
                         @if ($row->category)
-                            <span class="badge text-bg-light border">{{ $row->category->name }}</span>
+                        <span class="badge text-bg-light border">{{ $row->category->name }}</span>
                         @else
-                            <span class="text-muted">Uncategorized</span>
+                        <span class="text-muted">Uncategorized</span>
                         @endif
                     </td>
                     <td>{{ $row->sku ?: '—' }}</td>
-                    <td>{{ number_format($row->unit_price, 2) }}</td>
+                    <td>{{ formatNaira($row->unit_price, 2) }}</td>
                     <td>
                         @if ($row->is_active)
-                            <span class="badge text-bg-success-subtle text-success-emphasis">Active</span>
+                        <span class="badge text-bg-success-subtle text-success-emphasis">Active</span>
                         @else
-                            <span class="badge text-bg-secondary-subtle text-secondary-emphasis">Inactive</span>
+                        <span class="badge text-bg-secondary-subtle text-secondary-emphasis">Inactive</span>
                         @endif
                     </td>
                     <td class="text-end no-export">
                         <div class="d-inline-flex gap-1">
                             @php
-                                $productPayload = [
-                                    'id' => $row->id,
-                                    'category_id' => $row->category_id,
-                                    'name' => $row->name,
-                                    'sku' => $row->sku,
-                                    'unit_price' => $row->unit_price,
-                                ];
+                            $productPayload = [
+                            'id' => $row->id,
+                            'category_id' => $row->category_id,
+                            'name' => $row->name,
+                            'sku' => $row->sku,
+                            'unit_price' => $row->unit_price,
+                            ];
                             @endphp
                             <button type="button"
                                 class="btn btn-sm btn-outline-secondary btn-edit-product"
@@ -113,22 +113,34 @@ $editingId = old('product_id');
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+
                     <div class="mb-3">
-                        <label for="productCategory" class="form-label">Category</label>
-                        <select class="form-select @error('category_id') is-invalid @enderror" id="productCategory" name="category_id" required>
-                            <option value="">&mdash; Select &mdash;</option>
-                            @foreach ($categories as $categoryOption)
-                                <option value="{{ $categoryOption->id }}" @selected(old('category_id') === $categoryOption->id)>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="productCategory" class="form-label mb-1">Category</label>
+                            <a href="javascript:void(0)" id="toggleNewCategory" class="small">+ Add new category</a>
+                        </div>
+
+                        <div id="existingCategoryWrap">
+                            <select class="form-select @error('category_id') is-invalid @enderror"
+                                id="productCategory" name="category_id">
+                                <option value="">&mdash; Select &mdash;</option>
+                                @foreach ($categories as $categoryOption)
+                                <option value="{{ $categoryOption->id }}"
+                                    @selected((string) old('category_id')===(string) $categoryOption->id)>
                                     {{ $categoryOption->name }}
                                 </option>
-                            @endforeach
-                        </select>
-                        @error('category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        @if ($categories->isEmpty())
-                            <div class="form-text text-warning">
-                                No categories yet — <a href="{{ route('company.product-categories.index', ['company' => $company->slug]) }}">add one first</a>.
-                            </div>
-                        @endif
+                                @endforeach
+                            </select>
+                            @error('category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div id="newCategoryWrap" class="d-none">
+                            <input type="text" class="form-control @error('new_category_name') is-invalid @enderror"
+                                id="newCategoryName" name="new_category_name" maxlength="100"
+                                placeholder="New category name" value="{{ old('new_category_name') }}" disabled>
+                            @error('new_category_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <div class="form-text">This category will also appear under Products &gt; Categories.</div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -175,8 +187,13 @@ $editingId = old('product_id');
             paging: false,
             info: false,
             responsive: true,
-            columnDefs: [{ targets: [0], orderable: false }],
-            language: { emptyTable: "No products yet" },
+            columnDefs: [{
+                targets: [0],
+                orderable: false
+            }],
+            language: {
+                emptyTable: "No products yet"
+            },
             dom: "<'row mb-3'" +
                 "<'col-lg-8 col-md-12 d-flex align-items-center gap-2 text-lg-start text-center mb-2 mb-lg-0'l f>" +
                 "<'col-lg-4 col-md-12 text-lg-end text-center mb-2 mb-lg-0'B>" +
@@ -186,11 +203,38 @@ $editingId = old('product_id');
                 "<'col-md-6 col-12 text-md-start text-center'i>" +
                 "<'col-md-6 col-12 d-flex justify-content-md-end justify-content-center'p>" +
                 ">",
-            buttons: [
-                { extend: 'print', className: 'btn-info', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'csv', className: 'btn-primary', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'excel', className: 'btn-success', title: printTitle, exportOptions: { columns: columnPrint } },
-                { extend: 'pdf', className: 'btn-warning', title: printTitle, exportOptions: { columns: columnPrint } },
+            buttons: [{
+                    extend: 'print',
+                    className: 'btn-info',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'csv',
+                    className: 'btn-primary',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn-success',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn-warning',
+                    title: printTitle,
+                    exportOptions: {
+                        columns: columnPrint
+                    }
+                },
             ]
         });
 
@@ -200,9 +244,48 @@ $editingId = old('product_id');
         var storeUrl = "{{ route('company.products.store', ['company' => $company->slug]) }}";
         var updateUrlTemplate = "{{ route('company.products.update', ['company' => $company->slug, 'product' => '__ID__']) }}";
 
+        //! Category toggle logic
+        var $existingWrap = $('#existingCategoryWrap');
+        var $newWrap = $('#newCategoryWrap');
+        var $select = $('#productCategory');
+        var $newInput = $('#newCategoryName');
+        var $toggle = $('#toggleNewCategory');
+
+        function setNewCategoryMode(on) {
+            $newWrap.toggleClass('d-none', !on);
+            $existingWrap.toggleClass('d-none', on);
+
+            // Disabled inputs aren't submitted, so only one of the two reaches the server.
+            $newInput.prop('disabled', !on).prop('required', on);
+            $select.prop('disabled', on);
+
+            if (on) {
+                $select.val('');
+                $newInput.trigger('focus');
+            } else {
+                $newInput.val('');
+            }
+            $toggle.text(on ? '← Choose existing category' : '+ Add new category');
+        }
+
+        $toggle.on('click', function(e) {
+            e.preventDefault();
+            setNewCategoryMode($newWrap.hasClass('d-none'));
+        });
+
+        // Start in "new category" mode when the company has no categories yet
+        // or when validation failed while the user was typing a new one.
+        @if($categories -> isEmpty() || old('new_category_name'))
+        setNewCategoryMode(true);
+        @endif
+        //! End category toggle logic
+
+        var hasNoCategories = {{ $categories->isEmpty() ? 'true' : 'false' }};
+
         function openCreateModal() {
             $form[0].reset();
             $form.attr('action', storeUrl);
+            setNewCategoryMode(hasNoCategories);
             $('#productMethod').val('');
             $('#productIdField').val('');
             $('#productModalTitle').text('Add product');
@@ -210,6 +293,7 @@ $editingId = old('product_id');
         }
 
         function openEditModal(product) {
+            setNewCategoryMode(false);
             $form.attr('action', updateUrlTemplate.replace('__ID__', product.id));
             $('#productMethod').val('PUT');
             $('#productIdField').val(product.id);
@@ -231,8 +315,13 @@ $editingId = old('product_id');
             var $form = $(this);
             if (window.alertify) {
                 alertify.confirm('Deactivate product', 'It will no longer be available for new orders. Continue?',
-                    function() { $form.off('submit').trigger('submit'); }, function() {});
-            } else { $form.off('submit').trigger('submit'); }
+                    function() {
+                        $form.off('submit').trigger('submit');
+                    },
+                    function() {});
+            } else {
+                $form.off('submit').trigger('submit');
+            }
         });
 
         $('.form-activate-product').on('submit', function(e) {
@@ -240,12 +329,17 @@ $editingId = old('product_id');
             var $form = $(this);
             if (window.alertify) {
                 alertify.confirm('Activate product', 'It will become available for new orders again. Continue?',
-                    function() { $form.off('submit').trigger('submit'); }, function() {});
-            } else { $form.off('submit').trigger('submit'); }
+                    function() {
+                        $form.off('submit').trigger('submit');
+                    },
+                    function() {});
+            } else {
+                $form.off('submit').trigger('submit');
+            }
         });
 
-        @if ($errors->any())
-            modal.show();
+        @if($errors -> any())
+        modal.show();
         @endif
     });
 </script>

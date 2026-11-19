@@ -19,12 +19,12 @@ class SuperAdminReportPageController extends Controller
 {
     public function index()
     {
-        $companies = Company::withCount(['contacts', 'orders'])->orderBy('name')->get();
+        $companies = Company::withCount(['contacts', 'orders' => fn($q) => $q->where('status', '!=', 'void')])->orderBy('name')->get();
 
         $perCompany = $companies->map(function ($company) {
             return [
                 'company' => $company,
-                'revenue' => (float) Order::where('company_id', $company->id)->sum('total_amount'),
+                'revenue' => (float) Order::where('company_id', $company->id)->where('status', '!=', 'void')->sum('total_amount'),
                 'outstanding' => $this->outstandingBalance($company->id),
                 'collected_this_month' => (float) Payment::whereHas('order', fn($q) => $q->where('company_id', $company->id))
                     ->whereMonth('received_at', now()->month)

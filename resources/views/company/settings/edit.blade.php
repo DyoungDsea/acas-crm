@@ -5,10 +5,10 @@
 @section('content')
 <div class="mb-4">
     <h1 class="h4 mb-1">Company Settings</h1>
-    <p class="text-muted small mb-0">{{ $company->name }} — payment rules and contact details.</p>
+    <p class="text-muted small mb-0">{{ $company->name }} — payment rules, contact details and receipt letterhead.</p>
 </div>
 
-<form method="POST" action="{{ route('company.settings.update', ['company' => $company->slug]) }}">
+<form method="POST" enctype="multipart/form-data" action="{{ route('company.settings.update', ['company' => $company->slug]) }}">
     @csrf
     @method('PUT')
 
@@ -92,6 +92,50 @@
                     @error('minimum_partial_percent')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="form-text">Leave blank to allow any partial amount, however small.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h6 mb-1">Receipt letterhead</h2>
+            <p class="text-muted small mb-3">
+                Printed on every receipt for {{ $company->name }}. Upload the banner artwork from your letterhead
+                (PNG or JPG, up to 2 MB). With a header image, the plain-text company name and address are left off the receipt.
+            </p>
+
+            <div class="row g-4 mb-3">
+                @foreach (['header' => 'Header banner', 'footer' => 'Footer banner'] as $slot => $label)
+                @php
+                    $path = $company->{"receipt_{$slot}_path"};
+                @endphp
+                <div class="col-lg-6">
+                    <label for="receipt_{{ $slot }}" class="form-label">{{ $label }}</label>
+                    @if ($path)
+                        <div class="border rounded p-2 mb-2 bg-white">
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($path) }}" alt="{{ $label }}" class="img-fluid">
+                        </div>
+                    @endif
+                    <input type="file" accept="image/png,image/jpeg,image/webp"
+                        class="form-control @error("receipt_{$slot}") is-invalid @enderror"
+                        id="receipt_{{ $slot }}" name="receipt_{{ $slot }}">
+                    @error("receipt_{$slot}")<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    @if ($path)
+                        <div class="form-check mt-2">
+                            <input type="checkbox" class="form-check-input" id="remove_receipt_{{ $slot }}"
+                                name="remove_receipt_{{ $slot }}" value="1">
+                            <label class="form-check-label small" for="remove_receipt_{{ $slot }}">Remove current {{ strtolower($label) }}</label>
+                        </div>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+
+            <div class="mb-1">
+                <label for="receiptNote" class="form-label">Receipt note <span class="text-muted fw-normal">(optional)</span></label>
+                <textarea class="form-control @error('receipt_note') is-invalid @enderror" id="receiptNote" name="receipt_note"
+                    rows="2" maxlength="500" placeholder="e.g. Goods sold are not returnable. Thank you for your patronage.">{{ old('receipt_note', $company->receipt_note) }}</textarea>
+                @error('receipt_note')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
         </div>
     </div>
